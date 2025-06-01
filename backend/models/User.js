@@ -5,8 +5,9 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     accountEmail: { type: String },
     salesEmail: { type: String },  
+    supplierName: { type: String },
     origin: { type: String },       
     productCategories: [{ type: String }] 
-}, { collection: 'users' }); // explicitly set collection name
+}, { collection: 'users' });
 
 module.exports = mongoose.model('User', userSchema);
