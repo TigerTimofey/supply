@@ -53,6 +53,29 @@ router.post('/:id/catalogue', async (req, res) => {
     }
 });
 
+// Remove catalogue CSV for user (support PATCH and PUT for frontend compatibility)
+router.patch('/:id/catalogue', async (req, res) => {
+    try {
+        const user = await userRepository.updateCatalogueCsv(req.params.id, '', '');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const { password, ...userData } = user.toObject();
+        res.json(userData);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+router.put('/:id/catalogue', async (req, res) => {
+    try {
+        const user = await userRepository.updateCatalogueCsv(req.params.id, '', '');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const { password, ...userData } = user.toObject();
+        res.json(userData);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 // Delete all users
 router.delete('/', async (req, res) => {
     try {

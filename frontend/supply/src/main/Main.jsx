@@ -1,5 +1,5 @@
 import jwt_decode from "jwt-decode";
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 const NAV_PAGES = [
   { label: 'Catalogue', key: 'catalogue' },
@@ -121,6 +121,28 @@ function Catalogue({ token }) {
     setRows(newRows);
     // Save to backend
     await saveCatalogue(text, file.name);
+  };
+
+  // Remove catalogue from backend and UI
+  const removeCatalogue = async () => {
+    if (!userId) return;
+    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
+      method: 'PUT'
+    });
+    setFileName('');
+    setRows([
+      {
+        code: '',
+        name: '',
+        description: '',
+        size: '',
+        order_unit: '',
+        price: '',
+        price_per_measure: '',
+        price_measure_unit: '',
+        optional_hide_from_market: ''
+      }
+    ]);
   };
 
   // Filtering logic
@@ -256,8 +278,31 @@ function Catalogue({ token }) {
             style={{ display: 'none' }}
           />
         </label>
-        <span style={{ fontSize: 14, color: '#666' }}>
-          {fileName ? fileName : 'Only .csv files are supported'}
+        <span style={{ fontSize: 14, color: '#666', display: 'flex', alignItems: 'center', gap: 6 }}>
+          {fileName ? (
+            <>
+              {fileName}
+              <button
+                onClick={removeCatalogue}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#ff4d4f',
+                  fontWeight: 700,
+                  fontSize: 18,
+                  cursor: 'pointer',
+                  marginLeft: 4,
+                  padding: 0,
+                  lineHeight: 1
+                }}
+                title="Remove file"
+              >
+                ×
+              </button>
+            </>
+          ) : (
+            'Only .csv files are supported'
+          )}
         </span>
       </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
