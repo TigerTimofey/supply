@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
 const userRepository = require('../repositories/UserRepository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -46,6 +45,12 @@ router.post('/:id/catalogue', async (req, res) => {
         const { csv, csvName } = req.body;
         const user = await userRepository.updateCatalogueCsv(req.params.id, csv, csvName);
         if (!user) return res.status(404).json({ error: 'User not found' });
+        // Add to history
+        await userRepository.addCatalogueHistory(req.params.id, {
+            action: 'added',
+            fileName: csvName,
+            csv
+        });
         const { password, ...userData } = user.toObject();
         res.json(userData);
     } catch (err) {
@@ -53,11 +58,33 @@ router.post('/:id/catalogue', async (req, res) => {
     }
 });
 
-// Remove catalogue CSV for user (support PATCH and PUT for frontend compatibility)
+// Remove catalogue CSV for user (PATCH and PUT)
 router.patch('/:id/catalogue', async (req, res) => {
     try {
         const user = await userRepository.updateCatalogueCsv(req.params.id, '', '');
         if (!user) return res.status(404).json({ error: 'User not found' });
+        // Add to history
+        await userRepository.addCatalogueHistory(req.params.id, {
+            action: 'removed',
+            fileName: user.catalogueCsvName,
+            csv: ''
+        });
+        const { password, ...userData } = user.toObject();
+        res.json(userData);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+router.put('/:id/catalogue', async (req, res) => {
+    try {
+        const user = await userRepository.updateCatalogueCsv(req.params.id, '', '');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        // Add to history
+        await userRepository.addCatalogueHistory(req.params.id, {
+            action: 'removed',
+            fileName: user.catalogueCsvName,
+            csv: ''
+        });
         const { password, ...userData } = user.toObject();
         res.json(userData);
     } catch (err) {
@@ -65,12 +92,24 @@ router.patch('/:id/catalogue', async (req, res) => {
     }
 });
 
-router.put('/:id/catalogue', async (req, res) => {
+// Get catalogue history for user
+router.get('/:id/catalogue/history', async (req, res) => {
     try {
-        const user = await userRepository.updateCatalogueCsv(req.params.id, '', '');
+        const history = await userRepository.getCatalogueHistory(req.params.id);
+        res.json(history);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Clear all catalogue history for user
+router.delete('/:id/catalogue/history', async (req, res) => {
+    try {
+        const user = await userRepository.getById(req.params.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
-        const { password, ...userData } = user.toObject();
-        res.json(userData);
+        user.catalogueHistory = [];
+        await user.save();
+        res.json({ success: true });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }

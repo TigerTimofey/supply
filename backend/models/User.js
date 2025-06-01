@@ -9,7 +9,13 @@ const userSchema = new mongoose.Schema({
     origin: { type: String },       
     productCategories: [{ type: String }],
     catalogueCsv: { type: String },
-    catalogueCsvName: { type: String }
+    catalogueCsvName: { type: String },
+    catalogueHistory: [{
+        date: { type: Date, default: Date.now },
+        action: { type: String, enum: ['added', 'removed', 'updated'], required: true },
+        fileName: { type: String },
+        csv: { type: String }
+    }]
 }, { collection: 'users' });
 
 module.exports = mongoose.model('User', userSchema);

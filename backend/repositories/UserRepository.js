@@ -21,6 +21,19 @@ class UserRepository {
     async getById(userId) {
         return User.findById(userId);
     }
+
+    async addCatalogueHistory(userId, entry) {
+        return User.findByIdAndUpdate(
+            userId,
+            { $push: { catalogueHistory: entry } },
+            { new: true }
+        );
+    }
+
+    async getCatalogueHistory(userId) {
+        const user = await User.findById(userId);
+        return user ? user.catalogueHistory || [] : [];
+    }
 }
 
 module.exports = new UserRepository();

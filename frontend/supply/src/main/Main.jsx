@@ -1,5 +1,5 @@
+import React, { useEffect, useState, useRef } from 'react';
 import jwt_decode from "jwt-decode";
-import { useEffect, useState, useRef } from 'react';
 
 const NAV_PAGES = [
   { label: 'Catalogue', key: 'catalogue' },
@@ -21,6 +21,258 @@ const CSV_FIELDS = [
   { key: 'price_measure_unit', label: 'Price Measure Unit' },
   { key: 'optional_hide_from_market', label: 'Hide from Market' }
 ];
+
+function ConfirmModal({ open, onClose, onConfirm, text }) {
+  if (!open) return null;
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      background: 'rgba(0,0,0,0.25)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 12, padding: 32, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 32px rgba(0,0,0,0.15)', position: 'relative'
+      }}>
+        <h3 style={{ marginTop: 0, color: '#213254', fontSize: 20 }}>Are you sure?</h3>
+        <div style={{ marginBottom: 24, color: '#444', fontSize: 15 }}>{text}</div>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#f0f4f8',
+              color: '#213254',
+              border: '1px solid #d1d5db',
+              borderRadius: 5,
+              padding: '6px 18px',
+              fontWeight: 500,
+              fontSize: 15,
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              background: '#61dafb',
+              color: '#213254',
+              border: 'none',
+              borderRadius: 5,
+              padding: '6px 18px',
+              fontWeight: 700,
+              fontSize: 15,
+              cursor: 'pointer'
+            }}
+          >
+            Yes, clear history
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CatalogueStats({ rows, history, onRevert, onClearHistory }) {
+  const total = rows.length && rows[0].code ? rows.length : 0;
+  const priceCount = rows.filter(r => r.price && r.price !== '0' && r.price !== '').length;
+  const hasHistory = Array.isArray(history) && history.length > 0;
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  return (
+    <div style={{
+      display: 'flex',
+      gap: 24,
+      marginBottom: 32,
+      flexWrap: 'wrap',
+      justifyContent: 'space-between'
+    }}>
+      <div style={{
+        flex: '1 1 200px',
+        background: '#f7fafd',
+        borderRadius: 12,
+        padding: '24px 18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        minWidth: 200,
+        textAlign: 'left'
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>0% of products updated in the last 2 weeks</div>
+        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>0 OUT OF {total}</div>
+      </div>
+      <div style={{
+        flex: '1 1 200px',
+        background: '#f7fafd',
+        borderRadius: 12,
+        padding: '24px 18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        minWidth: 200,
+        textAlign: 'left'
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
+          {total === 0 ? '0%' : `${Math.round((priceCount / total) * 100)}%`} of products have prices
+        </div>
+        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>{priceCount} OUT OF {total}</div>
+      </div>
+      <div style={{
+        flex: '1 1 200px',
+        background: '#f7fafd',
+        borderRadius: 12,
+        padding: '24px 18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        minWidth: 200,
+        textAlign: 'left'
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
+          0% of products have pictures
+        </div>
+        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>0 OUT OF {total}</div>
+      </div>
+      <div style={{
+        flex: '1 1 200px',
+        background: '#f7fafd',
+        borderRadius: 12,
+        padding: '24px 18px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        minWidth: 200,
+        textAlign: 'left',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Revert catalogue</div>
+        
+        {hasHistory ? (
+          <div style={{ color: '#213254', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
+            Show History & Revert
+            <div style={{ marginTop: 10, maxHeight: 120, overflowY: 'auto', fontWeight: 400, fontSize: 14 }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {history.slice().reverse().map((h, i) => (
+                  <li key={i} style={{ marginBottom: 8, borderBottom: '1px solid #eee', paddingBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>
+                      <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b>
+                      {h.fileName ? ` "${h.fileName}"` : ''}
+                      <span style={{ color: '#888', marginLeft: 6, fontSize: 12 }}>
+                        {h.date ? new Date(h.date).toLocaleString() : ''}
+                      </span>
+                    </span>
+                    {h.action === 'added' && (
+                      <button
+                        onClick={() => onRevert(h)}
+                        style={{
+                          marginLeft: 10,
+                          background: '#61dafb',
+                          color: '#213254',
+                          border: 'none',
+                          borderRadius: 5,
+                          padding: '2px 10px',
+                          fontWeight: 700,
+                          fontSize: 13,
+                          cursor: 'pointer'
+                        }}
+                        title="Revert to this version"
+                      >
+                        Revert
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => setShowConfirm(true)}
+                style={{
+                  marginTop: 8,
+                  background: '#f0f4f8',
+                  color: '#213254',
+                  border: '1px solid #d1d5db',
+                  borderRadius: 5,
+                  padding: '4px 12px',
+                  fontWeight: 500,
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  width: '100%',
+                  marginBottom: 8,
+                  transition: 'background 0.15s, color 0.15s, border 0.15s'
+                }}
+                title="Clear all history"
+              >
+                Clear History
+              </button>
+              <ConfirmModal
+                open={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={() => {
+                  setShowConfirm(false);
+                  onClearHistory();
+                }}
+                text="This will permanently remove all catalogue history for this user. Are you sure?"
+              />
+            </div>
+          </div>
+        ) : (
+          <div style={{ color: '#213254', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
+            NO PREVIOUS VERSIONS AVAILABLE
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CatalogueHistoryModal({ open, onClose, token }) {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  let userId = '';
+  try {
+    userId = jwt_decode(token).userId;
+  } catch {}
+
+  useEffect(() => {
+    if (open && userId) {
+      setLoading(true);
+      fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+        .then(res => res.json())
+        .then(data => {
+          setHistory(Array.isArray(data) ? data : []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
+  }, [open, userId]);
+
+  if (!open) return null;
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      background: 'rgba(0,0,0,0.25)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 12, padding: 32, minWidth: 340, maxWidth: 500, boxShadow: '0 4px 32px rgba(0,0,0,0.15)', position: 'relative'
+      }}>
+        <button onClick={onClose} style={{
+          position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#213254', cursor: 'pointer'
+        }}>×</button>
+        <h3 style={{ marginTop: 0, color: '#213254' }}>Catalogue History</h3>
+        {loading ? (
+          <div>Loading...</div>
+        ) : history.length === 0 ? (
+          <div style={{ color: '#888' }}>No history available.</div>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {history.slice().reverse().map((h, i) => (
+              <li key={i} style={{ marginBottom: 18, borderBottom: '1px solid #eee', paddingBottom: 10 }}>
+                <div>
+                  <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b> {h.fileName ? `file "${h.fileName}"` : ''} 
+                  <span style={{ color: '#888', marginLeft: 8, fontSize: 13 }}>
+                    {h.date ? new Date(h.date).toLocaleString() : ''}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Catalogue({ token }) {
   const [rows, setRows] = useState([
@@ -44,7 +296,10 @@ function Catalogue({ token }) {
   const [copied, setCopied] = useState(false);
   const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
-  let infoTimeout = useRef();
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [hasHistory, setHasHistory] = useState(false);
+  const [history, setHistory] = useState([]);
+  const infoTimeout = useRef();
 
   // Get userId from token
   let userId = '';
@@ -81,6 +336,22 @@ function Catalogue({ token }) {
       .catch(() => setLoading(false));
     // eslint-disable-next-line
   }, [userId]);
+
+  // Check if user has history
+  useEffect(() => {
+    if (!userId) return;
+    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+      .then(res => res.json())
+      .then(data => setHasHistory(Array.isArray(data) && data.length > 0));
+  }, [userId, fileName]);
+
+  // Fetch history for stats card
+  useEffect(() => {
+    if (!userId) return;
+    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+      .then(res => res.json())
+      .then(data => setHistory(Array.isArray(data) ? data : []));
+  }, [userId, fileName]);
 
   // Save catalogue to backend (save both content and filename)
   const saveCatalogue = async (csvString, fileName) => {
@@ -145,6 +416,45 @@ function Catalogue({ token }) {
     ]);
   };
 
+  // Revert to a previous catalogue version
+  const revertCatalogue = async (historyEntry) => {
+    if (!userId || !historyEntry.csv) return;
+    // Save selected version as current
+    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csv: historyEntry.csv, csvName: historyEntry.fileName })
+    });
+    // Refresh UI
+    setFileName(historyEntry.fileName);
+    const lines = historyEntry.csv.trim().split('\n');
+    if (lines.length) {
+      const headers = lines[0].split(';').map(h => h.trim());
+      const newRows = lines.slice(1).map(line => {
+        const cells = line.split(';').map(cell => cell.trim());
+        const row = {};
+        headers.forEach((h, i) => {
+          row[h] = cells[i] || '';
+        });
+        return row;
+      });
+      setRows(newRows);
+    }
+    // Optionally, reload history
+    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+      .then(res => res.json())
+      .then(data => setHistory(Array.isArray(data) ? data : []));
+  };
+
+  // Clear all history
+  const clearHistory = async () => {
+    if (!userId) return;
+    await fetch(`http://localhost:8080/users/${userId}/catalogue/history`, {
+      method: 'DELETE'
+    });
+    setHistory([]);
+  };
+
   // Filtering logic
   let filteredRows = rows.filter(row =>
     row.name?.toLowerCase().includes(search.toLowerCase()) &&
@@ -170,226 +480,241 @@ function Catalogue({ token }) {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ color: '#213254', marginBottom: 0, marginRight: 12 }}>Catalogue</h2>
-        <div
-          style={{ position: 'relative', display: 'inline-block' }}
-          onMouseEnter={() => {
-            clearTimeout(infoTimeout.current);
-            setInfoOpen(true);
-          }}
-          onMouseLeave={() => {
-            infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
-          }}
-          tabIndex={0}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="#61dafb" style={{ cursor: 'pointer', verticalAlign: 'middle' }}>
-            <circle cx="10" cy="10" r="9" stroke="#61dafb" strokeWidth="2" fill="none"/>
-            <text x="10" y="15" textAnchor="middle" fontSize="13" fill="#61dafb" fontWeight="bold">i</text>
-          </svg>
-          {infoOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                left: '50%',
-                top: '120%',
-                transform: 'translateX(-50%)',
-                background: '#fff',
-                color: '#23272f',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
-                padding: '14px 18px',
-                fontSize: 14,
-                minWidth: 340,
-                maxWidth: 340,
-                zIndex: 100,
-                whiteSpace: 'pre-line',
-                pointerEvents: 'auto'
-              }}
-              onMouseEnter={() => {
-                clearTimeout(infoTimeout.current);
-                setInfoOpen(true);
-              }}
-              onMouseLeave={() => {
-                infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
-              }}
-            >
-              <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <b>Example CSV:</b>
-                <button
-                  onClick={handleCopy}
-                  style={{
-                    marginLeft: 12,
-                    background: '#61dafb',
-                    color: '#213254',
-                    border: 'none',
-                    borderRadius: 5,
-                    padding: '4px 12px',
-                    fontWeight: 700,
-                    fontSize: 13,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-              </div>
-              <pre style={{
-                background: '#f7fafd',
-                borderRadius: 6,
-                padding: 10,
-                margin: 0,
-                fontSize: 13,
-                overflowX: 'auto'
-              }}>
+      {/* Info icon, file upload, and file name */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+          <h2 style={{ color: '#213254', marginBottom: 0, marginRight: 12 }}>Catalogue</h2>
+          <div
+            style={{ position: 'relative', display: 'inline-block' }}
+            onMouseEnter={() => {
+              clearTimeout(infoTimeout.current);
+              setInfoOpen(true);
+            }}
+            onMouseLeave={() => {
+              infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
+            }}
+            tabIndex={0}
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#61dafb" style={{ cursor: 'pointer', verticalAlign: 'middle' }}>
+              <circle cx="10" cy="10" r="9" stroke="#61dafb" strokeWidth="2" fill="none"/>
+              <text x="10" y="15" textAnchor="middle" fontSize="13" fill="#61dafb" fontWeight="bold">i</text>
+            </svg>
+            {infoOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: '120%',
+                  transform: 'translateX(-50%)',
+                  background: '#fff',
+                  color: '#23272f',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+                  padding: '14px 18px',
+                  fontSize: 14,
+                  minWidth: 340,
+                  maxWidth: 340,
+                  zIndex: 100,
+                  whiteSpace: 'pre-line',
+                  pointerEvents: 'auto'
+                }}
+                onMouseEnter={() => {
+                  clearTimeout(infoTimeout.current);
+                  setInfoOpen(true);
+                }}
+                onMouseLeave={() => {
+                  infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
+                }}
+              >
+                <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <b>Example CSV:</b>
+                  <button
+                    onClick={handleCopy}
+                    style={{
+                      marginLeft: 12,
+                      background: '#61dafb',
+                      color: '#213254',
+                      border: 'none',
+                      borderRadius: 5,
+                      padding: '4px 12px',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <pre style={{
+                  background: '#f7fafd',
+                  borderRadius: 6,
+                  padding: 10,
+                  margin: 0,
+                  fontSize: 13,
+                  overflowX: 'auto'
+                }}>
 {csvExample}
-              </pre>
-            </div>
-          )}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
+          <label
+            htmlFor="csv-upload"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: '#f7fafd',
+              color: '#213254',
+              border: '1px solid #61dafb',
+              borderRadius: 8,
+              padding: '10px 22px',
+              fontWeight: 600,
+              fontSize: 15,
+              cursor: 'pointer',
+              transition: 'background 0.15s, color 0.15s, border 0.15s'
+            }}
+          >
+            <svg width="18" height="18" fill="#61dafb" style={{ marginRight: 8 }} viewBox="0 0 20 20">
+              <path d="M16.5 10.5a.75.75 0 0 0-.75.75v3.25a1 1 0 0 1-1 1h-9.5a1 1 0 0 1-1-1v-3.25a.75.75 0 0 0-1.5 0v3.25A2.5 2.5 0 0 0 5.25 17h9.5A2.5 2.5 0 0 0 17.25 14.5v-3.25a.75.75 0 0 0-.75-.75z"/>
+              <path d="M10.75 13.25V4.81l2.22 2.22a.75.75 0 1 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06l2.22-2.22v8.44a.75.75 0 0 0 1.5 0z"/>
+            </svg>
+            Choose CSV file
+            <input
+              id="csv-upload"
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </label>
+          <span style={{ fontSize: 14, color: '#666', display: 'flex', alignItems: 'center', gap: 6 }}>
+            {fileName ? (
+              <>
+                {fileName}
+                <button
+                  onClick={removeCatalogue}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#ff4d4f',
+                    fontWeight: 700,
+                    fontSize: 18,
+                    cursor: 'pointer',
+                    marginLeft: 4,
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                  title="Remove file"
+                >
+                  ×
+                </button>
+              </>
+            ) : (
+              'Only .csv files are supported'
+            )}
+          </span>
         </div>
       </div>
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <label
-          htmlFor="csv-upload"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            background: '#f7fafd',
-            color: '#213254',
-            border: '1px solid #61dafb',
-            borderRadius: 8,
-            padding: '10px 22px',
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: 'pointer',
-            transition: 'background 0.15s, color 0.15s, border 0.15s'
-          }}
-        >
-          <svg width="18" height="18" fill="#61dafb" style={{ marginRight: 8 }} viewBox="0 0 20 20">
-            <path d="M16.5 10.5a.75.75 0 0 0-.75.75v3.25a1 1 0 0 1-1 1h-9.5a1 1 0 0 1-1-1v-3.25a.75.75 0 0 0-1.5 0v3.25A2.5 2.5 0 0 0 5.25 17h9.5A2.5 2.5 0 0 0 17.25 14.5v-3.25a.75.75 0 0 0-.75-.75z"/>
-            <path d="M10.75 13.25V4.81l2.22 2.22a.75.75 0 1 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06l2.22-2.22v8.44a.75.75 0 0 0 1.5 0z"/>
-          </svg>
-          Choose CSV file
+       <div style={{ width: '100%', height: 1, background: '#e0e0e0', margin: '24px 0' }} />
+      {/* Sticker cards between file upload and catalogue data */}
+      <CatalogueStats rows={rows} history={history} onRevert={revertCatalogue} onClearHistory={clearHistory} />
+      {/* Divider line */}
+      <div style={{ width: '100%', height: 1, background: '#e0e0e0', margin: '24px 0' }} />
+      {/* Search input in its own div */}
+      <div>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
           <input
-            id="csv-upload"
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
+            type="text"
+            placeholder="Search by name"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: '1px solid #ccc',
+              fontSize: 15,
+              minWidth: 180
+            }}
           />
-        </label>
-        <span style={{ fontSize: 14, color: '#666', display: 'flex', alignItems: 'center', gap: 6 }}>
-          {fileName ? (
-            <>
-              {fileName}
-              <button
-                onClick={removeCatalogue}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#ff4d4f',
-                  fontWeight: 700,
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  marginLeft: 4,
-                  padding: 0,
-                  lineHeight: 1
-                }}
-                title="Remove file"
-              >
-                ×
-              </button>
-            </>
-          ) : (
-            'Only .csv files are supported'
-          )}
-        </span>
+        </div>
       </div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            borderRadius: 6,
-            border: '1px solid #ccc',
-            fontSize: 15,
-            minWidth: 180
-          }}
-        />
-      </div>
-      <div style={{ overflowX: 'auto', marginTop: 24 }}>
-        <table style={{ borderCollapse: 'collapse', width: '100%', background: '#fff', color: '#23272f', fontSize: 15 }}>
-          <thead>
-            <tr>
-              {CSV_FIELDS.map(field => (
-                <th key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10, background: '#f7fafd', fontWeight: 700, position: 'relative' }}>
-                  {field.label}
-                  {field.key === 'code' && (
-                    <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
-                      <span
-                        style={{
-                          color: codeSort === 'asc' ? '#61dafb' : '#bbb',
-                          marginRight: 2
-                        }}
-                        onClick={() => setCodeSort(codeSort === 'asc' ? null : 'asc')}
-                        title="Sort by code: A-Z"
-                      >▲</span>
-                      <span
-                        style={{
-                          color: codeSort === 'desc' ? '#61dafb' : '#bbb'
-                        }}
-                        onClick={() => setCodeSort(codeSort === 'desc' ? null : 'desc')}
-                        title="Sort by code: Z-A"
-                      >▼</span>
-                    </span>
-                  )}
-                  {field.key === 'price' && (
-                    <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
-                      <span
-                        style={{
-                          color: priceSort === 'asc' ? '#61dafb' : '#bbb',
-                          marginRight: 2
-                        }}
-                        onClick={() => setPriceSort(priceSort === 'asc' ? null : 'asc')}
-                        title="Sort by price: low to high"
-                      >▲</span>
-                      <span
-                        style={{
-                          color: priceSort === 'desc' ? '#61dafb' : '#bbb'
-                        }}
-                        onClick={() => setPriceSort(priceSort === 'desc' ? null : 'desc')}
-                        title="Sort by price: high to low"
-                      >▼</span>
-                    </span>
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRows.length === 0 ? (
+      {/* Table in its own div */}
+      <div>
+        <div style={{ overflowX: 'auto', marginTop: 24 }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', background: '#fff', color: '#23272f', fontSize: 15 }}>
+            <thead>
               <tr>
-                <td colSpan={CSV_FIELDS.length} style={{ color: '#888', padding: 20, textAlign: 'center' }}>
-                  <em>No data</em>
-                </td>
+                {CSV_FIELDS.map(field => (
+                  <th key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10, background: '#f7fafd', fontWeight: 700, position: 'relative' }}>
+                    {field.label}
+                    {field.key === 'code' && (
+                      <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
+                        <span
+                          style={{
+                            color: codeSort === 'asc' ? '#61dafb' : '#bbb',
+                            marginRight: 2
+                          }}
+                          onClick={() => setCodeSort(codeSort === 'asc' ? null : 'asc')}
+                          title="Sort by code: A-Z"
+                        >▲</span>
+                        <span
+                          style={{
+                            color: codeSort === 'desc' ? '#61dafb' : '#bbb'
+                          }}
+                          onClick={() => setCodeSort(codeSort === 'desc' ? null : 'desc')}
+                          title="Sort by code: Z-A"
+                        >▼</span>
+                      </span>
+                    )}
+                    {field.key === 'price' && (
+                      <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
+                        <span
+                          style={{
+                            color: priceSort === 'asc' ? '#61dafb' : '#bbb',
+                            marginRight: 2
+                          }}
+                          onClick={() => setPriceSort(priceSort === 'asc' ? null : 'asc')}
+                          title="Sort by price: low to high"
+                        >▲</span>
+                        <span
+                          style={{
+                            color: priceSort === 'desc' ? '#61dafb' : '#bbb'
+                          }}
+                          onClick={() => setPriceSort(priceSort === 'desc' ? null : 'desc')}
+                          title="Sort by price: high to low"
+                        >▼</span>
+                      </span>
+                    )}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              filteredRows.map((row, i) => (
-                <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
-                  {CSV_FIELDS.map(field => (
-                    <td key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10 }}>
-                      {row[field.key]}
-                    </td>
-                  ))}
+            </thead>
+            <tbody>
+              {filteredRows.length === 0 ? (
+                <tr>
+                  <td colSpan={CSV_FIELDS.length} style={{ color: '#888', padding: 20, textAlign: 'center' }}>
+                    <em>No data</em>
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredRows.map((row, i) => (
+                  <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
+                    {CSV_FIELDS.map(field => (
+                      <td key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10 }}>
+                        {row[field.key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+      <CatalogueHistoryModal open={historyOpen} onClose={() => setHistoryOpen(false)} token={token} />
     </div>
   );
 }
