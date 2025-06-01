@@ -23,6 +23,8 @@ export default function Login({ onLogin, switchToRegister }) {
       if (res.ok) {
         setMessage('Login successful!');
         onLogin && onLogin(data.token);
+        // Save token to localStorage for persistence
+        localStorage.setItem('token', data.token);
         navigate('/main');
       } else {
         if (data.error === 'Invalid credentials') {

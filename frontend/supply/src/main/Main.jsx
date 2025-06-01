@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-export default function Main({ token }) {
+export default function Main({ token, onLogout }) {
   const [supplierName, setSupplierName] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
@@ -34,6 +34,8 @@ export default function Main({ token }) {
   }, [dropdownOpen]);
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    if (onLogout) onLogout();
     window.location.href = '/';
   };
 
