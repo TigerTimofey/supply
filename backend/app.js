@@ -3,11 +3,16 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
 app.use(express.json());
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.get('/', (req, res) => {
+    res.send('API is running');
+});
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
