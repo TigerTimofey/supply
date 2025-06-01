@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const userRepository = require('../repositories/UserRepository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -27,14 +28,28 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get user by id (excluding password)
+// Get user by id (for fetching catalogueCsv)
 router.get('/:id', async (req, res) => {
     try {
-        const user = await User.findById(req.params.id, { password: 0 });
+        const user = await userRepository.getById(req.params.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user); 
+        const { password, ...userData } = user.toObject();
+        res.json(userData);
     } catch (err) {
-        res.status(400).json({ error: 'Invalid user id' });
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Save catalogue CSV for user
+router.post('/:id/catalogue', async (req, res) => {
+    try {
+        const { csv, csvName } = req.body;
+        const user = await userRepository.updateCatalogueCsv(req.params.id, csv, csvName);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const { password, ...userData } = user.toObject();
+        res.json(userData);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
 });
 

@@ -1,3 +1,4 @@
+import jwt_decode from "jwt-decode";
 import React, { useEffect, useState, useRef } from 'react';
 
 const NAV_PAGES = [
@@ -21,7 +22,7 @@ const CSV_FIELDS = [
   { key: 'optional_hide_from_market', label: 'Hide from Market' }
 ];
 
-function Catalogue() {
+function Catalogue({ token }) {
   const [rows, setRows] = useState([
     {
       code: '',
@@ -42,7 +43,54 @@ function Catalogue() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [loading, setLoading] = useState(true);
   let infoTimeout = useRef();
+
+  // Get userId from token
+  let userId = '';
+  try {
+    userId = jwt_decode(token).userId;
+  } catch {}
+
+  // Load catalogue from backend on mount
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    fetch(`http://localhost:8080/users/${userId}`)
+      .then(res => res.json())
+      .then(user => {
+        if (user.catalogueCsv) {
+          const text = user.catalogueCsv;
+          setFileName(user.catalogueCsvName || 'catalogue.csv');
+          const lines = text.trim().split('\n');
+          if (lines.length) {
+            const headers = lines[0].split(';').map(h => h.trim());
+            const newRows = lines.slice(1).map(line => {
+              const cells = line.split(';').map(cell => cell.trim());
+              const row = {};
+              headers.forEach((h, i) => {
+                row[h] = cells[i] || '';
+              });
+              return row;
+            });
+            setRows(newRows);
+          }
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+    // eslint-disable-next-line
+  }, [userId]);
+
+  // Save catalogue to backend (save both content and filename)
+  const saveCatalogue = async (csvString, fileName) => {
+    if (!userId) return;
+    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csv: csvString, csvName: fileName })
+    });
+  };
 
   const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
 `;
@@ -71,6 +119,8 @@ function Catalogue() {
       return row;
     });
     setRows(newRows);
+    // Save to backend
+    await saveCatalogue(text, file.name);
   };
 
   // Filtering logic
@@ -578,7 +628,7 @@ export default function Main({ token, onLogout }) {
       </nav>
       <div style={{ padding: 32 }}>
         {activePage === 'catalogue' ? (
-          <Catalogue />
+          <Catalogue token={token} />
         ) : (
           <h2>
             {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
