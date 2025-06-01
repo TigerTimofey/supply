@@ -1,9 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+const NAV_PAGES = [
+  { label: 'Catalogue', key: 'catalogue' },
+  { label: 'Marketing', key: 'marketing' },
+  { label: 'Orders', key: 'orders' },
+  { label: 'Customers', key: 'customers' },
+  { label: 'Payments', key: 'payments' },
+  { label: 'Chat', key: 'chat' }
+];
+
 export default function Main({ token, onLogout }) {
   const [supplierName, setSupplierName] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [burgerOpen, setBurgerOpen] = useState(false);
+  const [activePage, setActivePage] = useState('catalogue');
   const dropdownRef = useRef();
+  const burgerRef = useRef();
 
   useEffect(() => {
     // Decode token to get userId
@@ -16,7 +28,7 @@ export default function Main({ token, onLogout }) {
     if (userId) {
       fetch(`http://localhost:8080/users/${userId}`)
         .then(res => res.json())
-        .then(user => setSupplierName(user.supplierName ));
+        .then(user => setSupplierName(user.supplierName));
     }
   }, [token]);
 
@@ -26,12 +38,13 @@ export default function Main({ token, onLogout }) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (burgerRef.current && !burgerRef.current.contains(event.target)) {
+        setBurgerOpen(false);
+      }
     }
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [dropdownOpen]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -39,21 +52,63 @@ export default function Main({ token, onLogout }) {
     window.location.href = '/';
   };
 
+  // Responsive: show burger menu on mobile
   return (
     <div>
-      <nav style={{
-        background: '#23272f',
-        color: '#fff',
-        padding: '20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontWeight: 600,
-        fontSize: 18,
-        position: 'relative'
-      }}>
-        <span>NOT A EKKI</span>
+      <nav
+        style={{
+          background: '#23272f',
+          color: '#fff',
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontWeight: 600,
+          fontSize: 18,
+          position: 'relative'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+          <span
+            style={{
+              fontWeight: 900,
+              fontSize: 22,
+              letterSpacing: '0.08em',
+              color: '#61dafb',
+              cursor: 'pointer'
+            }}
+            onClick={() => setActivePage('catalogue')}
+          >
+            NOT A EKKI
+          </span>
+          <div className="main-nav-menu" style={{
+            display: 'flex',
+            gap: 24
+          }}>
+            {NAV_PAGES.map(page => (
+              <button
+                key={page.key}
+                onClick={() => setActivePage(page.key)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: activePage === page.key ? '#61dafb' : '#fff',
+                  fontWeight: activePage === page.key ? 700 : 500,
+                  fontSize: 17,
+                  cursor: 'pointer',
+                  padding: '6px 10px',
+                  borderBottom: activePage === page.key ? '2px solid #61dafb' : '2px solid transparent',
+                  transition: 'color 0.15s, border-bottom 0.15s'
+                }}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Desktop dropdown */}
         <div
+          className="main-nav-dropdown"
           style={{ position: 'relative', display: 'inline-block' }}
           ref={dropdownRef}
           onMouseEnter={() => setDropdownOpen(true)}
@@ -69,7 +124,9 @@ export default function Main({ token, onLogout }) {
               fontWeight: 700,
               fontSize: 16,
               cursor: 'pointer',
+              display: 'none'
             }}
+            className="main-nav-dropdown-btn"
           >
             {supplierName} ▾
           </button>
@@ -87,7 +144,7 @@ export default function Main({ token, onLogout }) {
                 padding: '8px 0',
                 transition: 'all 0.2s',
                 overflow: 'hidden',
-                textAlign:'center',
+                textAlign: 'center',
                 zIndex: 1000
               }}
             >
@@ -100,7 +157,7 @@ export default function Main({ token, onLogout }) {
                   background: '#f7fafd'
                 }}
               >
-                Settings
+                {supplierName}
               </div>
               <button
                 onClick={handleLogout}
@@ -125,11 +182,130 @@ export default function Main({ token, onLogout }) {
             </div>
           )}
         </div>
+        {/* Burger menu for mobile */}
+        <div className="main-nav-burger" ref={burgerRef} style={{ display: 'none', position: 'relative' }}>
+          <button
+            onClick={() => setBurgerOpen(b => !b)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#61dafb',
+              fontSize: 28,
+              cursor: 'pointer',
+              padding: 6,
+              marginLeft: 12
+            }}
+            aria-label="Menu"
+          >
+            ☰
+          </button>
+          {burgerOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                width: '80vw',
+                maxWidth: 320,
+                height: '100vh',
+                background: '#23272f',
+                color: '#fff',
+                zIndex: 2000,
+                boxShadow: '-2px 0 16px rgba(0,0,0,0.18)',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '32px 16px 16px 16px',
+                gap: 16
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 24
+              }}>
+                <span style={{ fontWeight: 900, fontSize: 22, color: '#61dafb' }}>
+                  {supplierName}
+                </span>
+                <button
+                  onClick={() => setBurgerOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#61dafb',
+                    fontSize: 32,
+                    cursor: 'pointer',
+                    marginLeft: 12,
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                  aria-label="Close menu"
+                >
+                  ×
+                </button>
+              </div>
+              {NAV_PAGES.map(page => (
+                <button
+                  key={page.key}
+                  onClick={() => {
+                    setActivePage(page.key);
+                    setBurgerOpen(false);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: activePage === page.key ? '#61dafb' : '#fff',
+                    fontWeight: activePage === page.key ? 700 : 500,
+                    fontSize: 18,
+                    cursor: 'pointer',
+                    padding: '10px 0',
+                    borderBottom: activePage === page.key ? '2px solid #61dafb' : '2px solid transparent',
+                    textAlign: 'left'
+                  }}
+                >
+                  {page.label}
+                </button>
+              ))}
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: '#61dafb',
+                  color: '#23272f',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '12px 0',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  cursor: 'pointer',
+                  marginTop: 24
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
       <div style={{ padding: 32 }}>
-        <h2>Welcome, {supplierName}!</h2>
-        {/* Main content goes here */}
+        <h2>
+          {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
+        </h2>
+        {/* Main content for the selected page can go here */}
       </div>
+      <style>
+        {`
+        @media (max-width: 900px) {
+          .main-nav-menu { display: none !important; }
+          .main-nav-dropdown-btn { display: none !important; }
+          .main-nav-burger { display: block !important; }
+        }
+        @media (min-width: 901px) {
+          .main-nav-menu { display: flex !important; }
+          .main-nav-dropdown-btn { display: inline-block !important; }
+          .main-nav-burger { display: none !important; }
+        }
+        `}
+      </style>
     </div>
   );
 }
