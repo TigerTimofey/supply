@@ -41,6 +41,7 @@ function Catalogue() {
   const [codeSort, setCodeSort] = useState(null); 
   const [infoOpen, setInfoOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [fileName, setFileName] = useState('');
   let infoTimeout = useRef();
 
   const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
@@ -56,6 +57,7 @@ function Catalogue() {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    setFileName(file.name);
     const text = await file.text();
     const lines = text.trim().split('\n');
     if (!lines.length) return;
@@ -204,7 +206,9 @@ function Catalogue() {
             style={{ display: 'none' }}
           />
         </label>
- 
+        <span style={{ fontSize: 14, color: '#666' }}>
+          {fileName ? fileName : 'Only .csv files are supported'}
+        </span>
       </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         <input
