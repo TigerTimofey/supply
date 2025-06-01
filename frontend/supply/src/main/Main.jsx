@@ -43,7 +43,8 @@ function Catalogue() {
   const [copied, setCopied] = useState(false);
   let infoTimeout = useRef();
 
-  const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market`;
+  const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
+`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(csvExample);
@@ -173,8 +174,37 @@ function Catalogue() {
           )}
         </div>
       </div>
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <input type="file" accept=".csv" onChange={handleFileChange} style={{ marginBottom: 12 }} />
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
+        <label
+          htmlFor="csv-upload"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: '#f7fafd',
+            color: '#213254',
+            border: '1px solid #61dafb',
+            borderRadius: 8,
+            padding: '10px 22px',
+            fontWeight: 600,
+            fontSize: 15,
+            cursor: 'pointer',
+            transition: 'background 0.15s, color 0.15s, border 0.15s'
+          }}
+        >
+          <svg width="18" height="18" fill="#61dafb" style={{ marginRight: 8 }} viewBox="0 0 20 20">
+            <path d="M16.5 10.5a.75.75 0 0 0-.75.75v3.25a1 1 0 0 1-1 1h-9.5a1 1 0 0 1-1-1v-3.25a.75.75 0 0 0-1.5 0v3.25A2.5 2.5 0 0 0 5.25 17h9.5A2.5 2.5 0 0 0 17.25 14.5v-3.25a.75.75 0 0 0-.75-.75z"/>
+            <path d="M10.75 13.25V4.81l2.22 2.22a.75.75 0 1 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 1 0 1.06 1.06l2.22-2.22v8.44a.75.75 0 0 0 1.5 0z"/>
+          </svg>
+          Choose CSV file
+          <input
+            id="csv-upload"
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+        </label>
+ 
       </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         <input
