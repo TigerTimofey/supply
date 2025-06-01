@@ -9,6 +9,190 @@ const NAV_PAGES = [
   { label: 'Chat', key: 'chat' }
 ];
 
+const CSV_FIELDS = [
+  { key: 'code', label: 'Code' },
+  { key: 'name', label: 'Name' },
+  { key: 'description', label: 'Description' },
+  { key: 'size', label: 'Size' },
+  { key: 'order_unit', label: 'Order Unit' },
+  { key: 'price', label: 'Price' },
+  { key: 'price_per_measure', label: 'Price per Measure' },
+  { key: 'price_measure_unit', label: 'Price Measure Unit' },
+  { key: 'optional_hide_from_market', label: 'Hide from Market' }
+];
+
+function Catalogue() {
+  const [rows, setRows] = useState([
+    {
+      code: '',
+      name: '',
+      description: '',
+      size: '',
+      order_unit: '',
+      price: '',
+      price_per_measure: '',
+      price_measure_unit: '',
+      optional_hide_from_market: ''
+    }
+  ]);
+  const [search, setSearch] = useState('');
+  const [codeSearch, setCodeSearch] = useState('');
+  const [priceSort, setPriceSort] = useState(null); // null | 'asc' | 'desc'
+  const [codeSort, setCodeSort] = useState(null); // null | 'asc' | 'desc'
+
+  // CSV upload handler
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    const lines = text.trim().split('\n');
+    if (!lines.length) return;
+    const headers = lines[0].split(';').map(h => h.trim());
+    const newRows = lines.slice(1).map(line => {
+      const cells = line.split(';').map(cell => cell.trim());
+      const row = {};
+      headers.forEach((h, i) => {
+        row[h] = cells[i] || '';
+      });
+      return row;
+    });
+    setRows(newRows);
+  };
+
+  // Filtering logic
+  let filteredRows = rows.filter(row =>
+    row.name?.toLowerCase().includes(search.toLowerCase()) &&
+    row.code?.toLowerCase().includes(codeSearch.toLowerCase())
+  );
+
+  // Sorting logic for price and code
+  if (priceSort) {
+    filteredRows = [...filteredRows].sort((a, b) => {
+      const priceA = parseFloat((a.price || '').replace(',', '.')) || 0;
+      const priceB = parseFloat((b.price || '').replace(',', '.')) || 0;
+      return priceSort === 'asc' ? priceA - priceB : priceB - priceA;
+    });
+  } else if (codeSort) {
+    filteredRows = [...filteredRows].sort((a, b) => {
+      const codeA = (a.code || '').toLowerCase();
+      const codeB = (b.code || '').toLowerCase();
+      if (codeA < codeB) return codeSort === 'asc' ? -1 : 1;
+      if (codeA > codeB) return codeSort === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  return (
+    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32 }}>
+      <h2 style={{ color: '#213254', marginBottom: 24 }}>Catalogue</h2>
+      <div style={{ marginBottom: 24 }}>
+        <input type="file" accept=".csv" onChange={handleFileChange} style={{ marginBottom: 12 }} />
+        <div style={{ fontSize: 14, color: '#666' }}>
+          <b>CSV format:</b> code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input
+          type="text"
+          placeholder="Search by code"
+          value={codeSearch}
+          onChange={e => setCodeSearch(e.target.value)}
+          style={{
+            padding: '8px 12px',
+            borderRadius: 6,
+            border: '1px solid #ccc',
+            fontSize: 15,
+            minWidth: 120
+          }}
+        />
+        <input
+          type="text"
+          placeholder="Search by name"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{
+            padding: '8px 12px',
+            borderRadius: 6,
+            border: '1px solid #ccc',
+            fontSize: 15,
+            minWidth: 180
+          }}
+        />
+      </div>
+      <div style={{ overflowX: 'auto', marginTop: 24 }}>
+        <table style={{ borderCollapse: 'collapse', width: '100%', background: '#fff', color: '#23272f', fontSize: 15 }}>
+          <thead>
+            <tr>
+              {CSV_FIELDS.map(field => (
+                <th key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10, background: '#f7fafd', fontWeight: 700, position: 'relative' }}>
+                  {field.label}
+                  {field.key === 'code' && (
+                    <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
+                      <span
+                        style={{
+                          color: codeSort === 'asc' ? '#61dafb' : '#bbb',
+                          marginRight: 2
+                        }}
+                        onClick={() => setCodeSort(codeSort === 'asc' ? null : 'asc')}
+                        title="Sort by code: A-Z"
+                      >▲</span>
+                      <span
+                        style={{
+                          color: codeSort === 'desc' ? '#61dafb' : '#bbb'
+                        }}
+                        onClick={() => setCodeSort(codeSort === 'desc' ? null : 'desc')}
+                        title="Sort by code: Z-A"
+                      >▼</span>
+                    </span>
+                  )}
+                  {field.key === 'price' && (
+                    <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
+                      <span
+                        style={{
+                          color: priceSort === 'asc' ? '#61dafb' : '#bbb',
+                          marginRight: 2
+                        }}
+                        onClick={() => setPriceSort(priceSort === 'asc' ? null : 'asc')}
+                        title="Sort by price: low to high"
+                      >▲</span>
+                      <span
+                        style={{
+                          color: priceSort === 'desc' ? '#61dafb' : '#bbb'
+                        }}
+                        onClick={() => setPriceSort(priceSort === 'desc' ? null : 'desc')}
+                        title="Sort by price: high to low"
+                      >▼</span>
+                    </span>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRows.length === 0 ? (
+              <tr>
+                <td colSpan={CSV_FIELDS.length} style={{ color: '#888', padding: 20, textAlign: 'center' }}>
+                  <em>No data</em>
+                </td>
+              </tr>
+            ) : (
+              filteredRows.map((row, i) => (
+                <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
+                  {CSV_FIELDS.map(field => (
+                    <td key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10 }}>
+                      {row[field.key]}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function Main({ token, onLogout }) {
   const [supplierName, setSupplierName] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -287,9 +471,13 @@ export default function Main({ token, onLogout }) {
         </div>
       </nav>
       <div style={{ padding: 32 }}>
-        <h2>
-          {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
-        </h2>
+        {activePage === 'catalogue' ? (
+          <Catalogue />
+        ) : (
+          <h2>
+            {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
+          </h2>
+        )}
         {/* Main content for the selected page can go here */}
       </div>
       <style>
