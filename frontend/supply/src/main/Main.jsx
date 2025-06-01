@@ -37,8 +37,19 @@ function Catalogue() {
   ]);
   const [search, setSearch] = useState('');
   const [codeSearch, setCodeSearch] = useState('');
-  const [priceSort, setPriceSort] = useState(null); // null | 'asc' | 'desc'
-  const [codeSort, setCodeSort] = useState(null); // null | 'asc' | 'desc'
+  const [priceSort, setPriceSort] = useState(null);
+  const [codeSort, setCodeSort] = useState(null); 
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  let infoTimeout = useRef();
+
+  const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(csvExample);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
 
   // CSV upload handler
   const handleFileChange = async (e) => {
@@ -83,28 +94,89 @@ function Catalogue() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32 }}>
-      <h2 style={{ color: '#213254', marginBottom: 24 }}>Catalogue</h2>
-      <div style={{ marginBottom: 24 }}>
-        <input type="file" accept=".csv" onChange={handleFileChange} style={{ marginBottom: 12 }} />
-        <div style={{ fontSize: 14, color: '#666' }}>
-          <b>CSV format:</b> code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
+    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ color: '#213254', marginBottom: 0, marginRight: 12 }}>Catalogue</h2>
+        <div
+          style={{ position: 'relative', display: 'inline-block' }}
+          onMouseEnter={() => {
+            clearTimeout(infoTimeout.current);
+            setInfoOpen(true);
+          }}
+          onMouseLeave={() => {
+            infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
+          }}
+          tabIndex={0}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="#61dafb" style={{ cursor: 'pointer', verticalAlign: 'middle' }}>
+            <circle cx="10" cy="10" r="9" stroke="#61dafb" strokeWidth="2" fill="none"/>
+            <text x="10" y="15" textAnchor="middle" fontSize="13" fill="#61dafb" fontWeight="bold">i</text>
+          </svg>
+          {infoOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '120%',
+                transform: 'translateX(-50%)',
+                background: '#fff',
+                color: '#23272f',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+                padding: '14px 18px',
+                fontSize: 14,
+                minWidth: 340,
+                maxWidth: 340,
+                zIndex: 100,
+                whiteSpace: 'pre-line',
+                pointerEvents: 'auto'
+              }}
+              onMouseEnter={() => {
+                clearTimeout(infoTimeout.current);
+                setInfoOpen(true);
+              }}
+              onMouseLeave={() => {
+                infoTimeout.current = setTimeout(() => setInfoOpen(false), 150);
+              }}
+            >
+              <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <b>Example CSV:</b>
+                <button
+                  onClick={handleCopy}
+                  style={{
+                    marginLeft: 12,
+                    background: '#61dafb',
+                    color: '#213254',
+                    border: 'none',
+                    borderRadius: 5,
+                    padding: '4px 12px',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <pre style={{
+                background: '#f7fafd',
+                borderRadius: 6,
+                padding: 10,
+                margin: 0,
+                fontSize: 13,
+                overflowX: 'auto'
+              }}>
+{csvExample}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <input type="file" accept=".csv" onChange={handleFileChange} style={{ marginBottom: 12 }} />
+      </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder="Search by code"
-          value={codeSearch}
-          onChange={e => setCodeSearch(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            borderRadius: 6,
-            border: '1px solid #ccc',
-            fontSize: 15,
-            minWidth: 120
-          }}
-        />
         <input
           type="text"
           placeholder="Search by name"
