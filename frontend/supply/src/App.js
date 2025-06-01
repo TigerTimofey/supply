@@ -6,9 +6,49 @@ import Main from './main/Main';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function AuthWrapper({ setToken, showRegister, setShowRegister }) {
+  // Dynamic styles for login/register mode
+  const isRegister = showRegister;
+  const textColor = isRegister ? '#213254' : '#61dafb';
+  const barBg = isRegister
+    ? 'linear-gradient(90deg, #213254 0%, #61dafb 100%)'
+    : 'linear-gradient(90deg, #61dafb 0%, #3e68bd 100%)';
+  const imageBg = isRegister ? '#61dafb' : '#213254';
+
   return (
     <div className="App-main">
-      <div className="App-image" />
+      <div
+        className="App-image"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          background: imageBg
+        }}
+      >
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative'
+        }}>
+          <div className="not-a-ekki-animation">
+            <span
+              className="not-a-ekki-text"
+              style={{ color: textColor }}
+            >
+              NOT A EKKI
+            </span>
+            <div
+              className="not-a-ekki-bar"
+              style={{ background: barBg }}
+            />
+          </div>
+        </div>
+      </div>
       <div className="App-form">
         {showRegister ? (
           <Register switchToLogin={() => setShowRegister(false)} />

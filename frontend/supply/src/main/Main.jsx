@@ -100,7 +100,7 @@ export default function Main({ token, onLogout }) {
                   background: '#f7fafd'
                 }}
               >
-                {supplierName}
+                Settings
               </div>
               <button
                 onClick={handleLogout}

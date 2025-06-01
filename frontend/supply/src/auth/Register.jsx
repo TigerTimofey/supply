@@ -18,14 +18,12 @@ export default function Register({ switchToLogin }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Use /users?email=... to check if user exists
   const checkUserExists = async () => {
     setChecking(true);
     try {
       const res = await fetch(`http://localhost:8080/users?email=${encodeURIComponent(form.email)}`);
       if (res.ok) {
         const users = await res.json();
-        // Fix: If users is an array and at least one user has the same email, then user exists
         if (Array.isArray(users) && users.some(u => u.email === form.email)) {
           setMessage('User already exists');
           setChecking(false);
@@ -127,7 +125,7 @@ export default function Register({ switchToLogin }) {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.04)',
+      background: 'rgba(247, 247, 247, 0.09)',
       padding: 32,
       borderRadius: 16,
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',

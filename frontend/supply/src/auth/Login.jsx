@@ -40,7 +40,7 @@ export default function Login({ onLogin, switchToRegister }) {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.04)',
+      background: 'rgba(247, 247, 247, 0.09)',
       padding: 32,
       borderRadius: 16,
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
