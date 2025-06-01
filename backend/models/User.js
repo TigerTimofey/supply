@@ -7,6 +7,6 @@ const userSchema = new mongoose.Schema({
     salesEmail: { type: String },  
     origin: { type: String },       
     productCategories: [{ type: String }] 
-});
+}, { collection: 'users' }); // explicitly set collection name
 
 module.exports = mongoose.model('User', userSchema);

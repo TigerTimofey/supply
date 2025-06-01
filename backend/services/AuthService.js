@@ -4,12 +4,18 @@ const userRepository = require('../repositories/UserRepository');
 require('dotenv').config();
 
 class AuthService {
-    async register(email, password) {
-        const existingUser = await userRepository.findByEmail(email);
+    async register(userData) {
+        const existingUser = await userRepository.findByEmail(userData.email);
         if (existingUser) throw new Error('User already exists');
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await userRepository.create({ email, password: hashedPassword });
-        return { id: user._id, email: user.email };
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const userToCreate = {
+            ...userData,
+            password: hashedPassword
+        };
+        const user = await userRepository.create(userToCreate);
+        // Return all fields except password
+        const { password, ...userWithoutPassword } = user.toObject();
+        return userWithoutPassword;
     }
 
     async login(email, password) {
