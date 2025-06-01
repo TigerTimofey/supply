@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login({ onLogin, switchToRegister }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,6 +23,7 @@ export default function Login({ onLogin, switchToRegister }) {
       if (res.ok) {
         setMessage('Login successful!');
         onLogin && onLogin(data.token);
+        navigate('/main');
       } else {
         if (data.error === 'Invalid credentials') {
           setMessage('Wrong email or password');
