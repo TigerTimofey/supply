@@ -9,22 +9,25 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        {!token ? (
-          showRegister ? (
-            <Register switchToLogin={() => setShowRegister(false)} />
+      <div className="App-main">
+        <div className="App-image" />
+        <div className="App-form">
+          {!token ? (
+            showRegister ? (
+              <Register switchToLogin={() => setShowRegister(false)} />
+            ) : (
+              <Login onLogin={setToken} switchToRegister={() => setShowRegister(true)} />
+            )
           ) : (
-            <Login onLogin={setToken} switchToRegister={() => setShowRegister(true)} />
-          )
-        ) : (
-          <div>
-            <h2>Welcome!</h2>
-            <div style={{ marginTop: 10, wordBreak: 'break-all' }}>
-              <strong>Token:</strong> {token}
+            <div>
+              <h2>Welcome!</h2>
+              <div style={{ marginTop: 10, wordBreak: 'break-all' }}>
+                <strong>Token:</strong> {token}
+              </div>
             </div>
-          </div>
-        )}
-      </header>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

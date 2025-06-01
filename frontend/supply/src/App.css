@@ -28,6 +28,45 @@
   color: #61dafb;
 }
 
+.App-main {
+  display: flex;
+  min-height: 100vh;
+}
+
+.App-image {
+  flex: 0 0 40%;
+  background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80') center center/cover no-repeat;
+  min-height: 300px;
+}
+
+.App-form {
+  flex: 1 1 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #282c34;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .App-main {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .App-image {
+    display: none;
+  }
+  .App-form {
+    flex: none;
+    width: 100%;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background: #282c34;
+  }
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

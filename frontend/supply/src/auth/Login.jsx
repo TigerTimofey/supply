@@ -22,7 +22,11 @@ export default function Login({ onLogin, switchToRegister }) {
         setMessage('Login successful!');
         onLogin && onLogin(data.token);
       } else {
-        setMessage(data.error || 'Error');
+        if (data.error === 'Invalid credentials') {
+          setMessage('Wrong email or password');
+        } else {
+          setMessage(data.error || 'Error');
+        }
       }
     } catch {
       setMessage('Network error');
@@ -30,9 +34,19 @@ export default function Login({ onLogin, switchToRegister }) {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={{ minWidth: 300 }}>
+    <div style={{
+      background: 'rgba(255,255,255,0.04)',
+      padding: 32,
+      borderRadius: 16,
+      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+      minWidth: 320,
+      maxWidth: 400,
+      width: '100%',
+      marginLeft: 16,
+      marginRight: 16
+    }}>
+      <h2 style={{ marginBottom: 24, fontWeight: 700, letterSpacing: 1 }}>Login</h2>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <input
           type="email"
           name="email"
@@ -40,7 +54,12 @@ export default function Login({ onLogin, switchToRegister }) {
           value={form.email}
           onChange={handleChange}
           required
-          style={{ margin: 4, width: '100%' }}
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
         />
         <input
           type="password"
@@ -49,16 +68,45 @@ export default function Login({ onLogin, switchToRegister }) {
           value={form.password}
           onChange={handleChange}
           required
-          style={{ margin: 4, width: '100%' }}
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            fontSize: 16
+          }}
         />
-        <button type="submit" style={{ margin: 8 }}>
+        <button
+          type="submit"
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            border: 'none',
+            background: '#61dafb',
+            color: '#222',
+            fontWeight: 700,
+            fontSize: 16,
+            cursor: 'pointer',
+            marginTop: 8
+          }}
+        >
           Login
         </button>
       </form>
-      <button onClick={switchToRegister} style={{ margin: 8 }}>
+      <button
+        onClick={switchToRegister}
+        style={{
+          marginTop: 16,
+          background: 'none',
+          border: 'none',
+          color: '#61dafb',
+          cursor: 'pointer',
+          fontSize: 15,
+          textDecoration: 'underline'
+        }}
+      >
         Create an account
       </button>
-      {message && <div style={{ marginTop: 10 }}>{message}</div>}
+      {message && <div style={{ marginTop: 18, color: '#ffbaba', fontWeight: 500 }}>{message}</div>}
     </div>
   );
 }
