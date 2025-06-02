@@ -7,7 +7,6 @@ import CatalogueStats from './components/catalogues-logic/CatalogueStats';
 import CatalogueHistoryModal from './components/catalogues-logic/CatalogueHistoryModal';
 import SupplierDataModal from './components/supplier-modal/SupplierDataModal';
 import Orders from './pages/Orders';
-import { getOrdersFromCatalogueRows } from './fake/ordersDb';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -41,24 +40,10 @@ import {
   navBurgerLogoutBtnStyle,
   navDropdownProfileBtnStyle,
   navDropdownLogoutBtnStyle,
-  inputStyle,
-  fieldRowStyle,
-  labelStyle,
-  buttonGroupStyle,
-  modalStyle,
-  responsiveModalStyle,
-  mobileFieldRowStyle,
-  mobileLabelEditRow,
-  saveBtnStyle,
-  cancelBtnStyle,
   navBurgerMenuStyle,
   navBurgerHeaderStyle,
   navBurgerBrandStyle,
-  modalOverlayStyle,
-  modalHeaderRowStyle,
-  profileHeaderStyle,
-  modalFormStyle,
-  editBtnStyle
+
 } from './styles/sharedStyles';
 
 // Import utils

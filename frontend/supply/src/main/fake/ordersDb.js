@@ -5,13 +5,13 @@ function randomInt(min, max) {
 }
 
 const FAKE_CUSTOMERS = [
-  { name: 'Alice Bakery' },
-  { name: 'Bob Cafe' },
-  { name: 'Charlie Restaurant' },
-  { name: 'Daisy Deli' },
-  { name: 'Eve Eatery' },
-  { name: 'Frank Foodhall' },
-  { name: 'Grace Grocery' }
+  { name: 'Alice Bakery', daysToPay: 14 },
+  { name: 'Bob Cafe', daysToPay: 21 },
+  { name: 'Charlie Restaurant', daysToPay: 7 },
+  { name: 'Daisy Deli', daysToPay: 14 },
+  { name: 'Eve Eatery', daysToPay: 21 },
+  { name: 'Frank Foodhall', daysToPay: 7 },
+
 ];
 
 const DAYS = [
@@ -34,13 +34,6 @@ function randomPaidStatus() {
   return 'pending';
 }
 
-function randomDaysToPay() {
-  // 50% 14 days, 25% 21 days, 25% 7 days
-  const r = Math.random();
-  if (r < 0.5) return 14;
-  if (r < 0.75) return 21;
-  return 7;
-}
 
 export function getOrdersFromCatalogueRows(rows) {
   if (!Array.isArray(rows) || rows.length === 0 || !rows[0].name) {
@@ -73,7 +66,6 @@ export function getOrdersFromCatalogueRows(rows) {
         }
       }
       const paidStatus = randomPaidStatus();
-      const daysToPay = randomDaysToPay();
       orders.push({
         orderNumber: generateOrderNumber(customerIdx + 1, dayIdx + 1),
         customerName: customer.name,
@@ -81,7 +73,7 @@ export function getOrdersFromCatalogueRows(rows) {
         day,
         invoiceTotal: products.reduce((sum, p) => sum + p.lineTotal, 0),
         paidStatus, // 'paid', 'unpaid', or 'pending'
-        daysToPay
+        daysToPay: customer.daysToPay
       });
     });
   });

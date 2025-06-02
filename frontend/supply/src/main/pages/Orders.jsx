@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
 import {
   catalogueContainerStyle,
@@ -121,19 +121,17 @@ export default function Orders({ catalogueRows }) {
   const [search, setSearch] = useState('');
   const [modalOrder, setModalOrder] = useState(null);
 
+  // Get orders/customers/days from catalogueRows (uploaded CSV)
   const { orders: ORDERS, customers: CUSTOMERS, days: DAYS } = getOrdersFromCatalogueRows(catalogueRows);
 
-  // Assign daysToPay per customer (e.g. Alice: 14, Bob: 21, Charlie: 7)
-  const customerDaysToPay = {
-    'Alice Bakery': 14,
-    'Bob Cafe': 21,
-    'Charlie Restaurant': 7
-  };
+  // Build customerDaysToPay from ordersDb (first order for each customer)
+  const customerDaysToPay = {};
+  ORDERS.forEach(order => {
+    if (order.customerName && order.daysToPay && customerDaysToPay[order.customerName] === undefined) {
+      customerDaysToPay[order.customerName] = order.daysToPay;
+    }
+  });
 
-  // Custom logic for paid/unpaid and order presence per customer
-  // - Alice Bakery: all paid
-  // - Bob Cafe: first 2 unpaid, next 2 no orders
-  // - Charlie Restaurant: default (first unpaid, last pending, others paid)
   const customerOrders = {};
   ORDERS.forEach(order => {
     let paidStatus = order.paidStatus;
@@ -141,14 +139,12 @@ export default function Orders({ catalogueRows }) {
     if (order.customerName === 'Alice Bakery') {
       paidStatus = 'paid';
     } else if (order.customerName === 'Bob Cafe') {
-      // Only first 2 days (Monday, Tuesday) are unpaid, rest no order
       if (order.day === DAYS[0] || order.day === DAYS[1]) {
         paidStatus = 'unpaid';
       } else {
         includeOrder = false;
       }
     } else if (order.customerName === 'Charlie Restaurant') {
-      // Default logic: first day unpaid, last day pending, others paid
       if (order.day === DAYS[0]) {
         paidStatus = 'unpaid';
       } else if (order.day === DAYS[DAYS.length - 1]) {
@@ -156,6 +152,14 @@ export default function Orders({ catalogueRows }) {
       } else {
         paidStatus = 'paid';
       }
+    } else if (
+      order.customerName === 'Daisy Deli' ||
+      order.customerName === 'Eve Eatery' ||
+      order.customerName === 'Frank Foodhall'
+    ) {
+      paidStatus = 'paid';
+    } else if (order.customerName === 'Grace Grocery') {
+      includeOrder = false;
     }
     if (includeOrder) {
       if (!customerOrders[order.customerName]) customerOrders[order.customerName] = [];
@@ -165,6 +169,11 @@ export default function Orders({ catalogueRows }) {
         daysToPay: customerDaysToPay[order.customerName]
       });
     }
+  });
+
+  // Ensure all customers are shown, even if no orders (for Grace Grocery)
+  Object.keys(customerDaysToPay).forEach(customer => {
+    if (!customerOrders[customer]) customerOrders[customer] = [];
   });
 
   // Filter logic: search by order number, customer, or product details
@@ -188,7 +197,7 @@ export default function Orders({ catalogueRows }) {
       <div style={{ marginBottom: 24, display: 'flex', gap: 16, alignItems: 'center' }}>
         <input
           type="text"
-          placeholder="Search by order number, customer or product"
+          placeholder="Search orders..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={searchInputStyle}
@@ -373,3 +382,4 @@ export default function Orders({ catalogueRows }) {
     </div>
   );
 }
+ 
