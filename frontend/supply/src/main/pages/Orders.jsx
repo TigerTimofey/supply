@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import React, { useState } from 'react';
 import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
 import {
   catalogueContainerStyle,
@@ -8,9 +8,12 @@ import {
   tdStyle,
   modalOverlayStyle,
   modalStyle,
-  closeBtnStyle
+  closeBtnStyle,
+  saveBtnStyle
 } from '../styles/sharedStyles';
+import InviteCustomersModal from '../components/InviteCustomersModal';
 
+// Order Modal
 function OrderModal({ open, order, onClose }) {
   if (!open || !order) return null;
 
@@ -120,9 +123,14 @@ function OrderModal({ open, order, onClose }) {
 export default function Orders({ catalogueRows }) {
   const [search, setSearch] = useState('');
   const [modalOrder, setModalOrder] = useState(null);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   // Get orders/customers/days from catalogueRows (uploaded CSV)
   const { orders: ORDERS, customers: CUSTOMERS, days: DAYS } = getOrdersFromCatalogueRows(catalogueRows);
+
+  // Get supplierName and supplierId from localStorage or context (fallback to empty)
+  const supplierName = localStorage.getItem('supplierName') || '';
+  const supplierId = localStorage.getItem('userId') || '';
 
   // Build customerDaysToPay from ordersDb (first order for each customer)
   const customerDaysToPay = {};
@@ -193,6 +201,50 @@ export default function Orders({ catalogueRows }) {
 
   return (
     <div style={catalogueContainerStyle}>
+      {/* Onboard banner */}
+      <div style={{
+        background: '#f7fafd',
+        border: '1.5px solid #61dafb',
+        borderRadius: 10,
+        padding: '18px 24px',
+        marginBottom: 28,
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        justifyContent: 'space-between',
+        gap: 18,
+        flexDirection: isMobile ? 'column' : 'row'
+      }}>
+        <div>
+          <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
+            {isMobile
+              ? 'onboard your customers to see more orders on NOT A EKKI'
+              : 'onboard your customers to see more orders on REKKI'}
+          </div>
+          {!isMobile && (
+            <div style={{ color: '#3e68bd', fontWeight: 600, fontSize: 15 }}>
+              it is completely free and means that you can manage all your orders in one place
+            </div>
+          )}
+        </div>
+        <button
+          style={{
+            ...saveBtnStyle,
+            minWidth: 160,
+            fontSize: 16,
+            padding: '10px 22px',
+            marginTop: isMobile ? 18 : 0
+          }}
+          onClick={() => setInviteModalOpen(true)}
+        >
+          Set up customer
+        </button>
+      </div>
+      <InviteCustomersModal
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        supplierName={supplierName}
+        supplierId={supplierId}
+      />
       <h2 style={{ color: '#213254', marginBottom: 18 }}>Orders</h2>
       <div style={{ marginBottom: 24, display: 'flex', gap: 16, alignItems: 'center' }}>
         <input
@@ -382,4 +434,3 @@ export default function Orders({ catalogueRows }) {
     </div>
   );
 }
- 
