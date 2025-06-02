@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ConfirmModal from './ConfirmModal';
+import ConfirmModal from '../confirmation-modal/ConfirmModal';
 
 export default function CatalogueHistoryModal({ open, onClose, history, onRevert, onClearHistory }) {
   const [showConfirm, setShowConfirm] = useState(false);
