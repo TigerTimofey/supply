@@ -11,11 +11,11 @@ import {
 function SmsInviteModal({ open, onClose, inviteLink }) {
   const [number, setNumber] = useState('');
   const [message, setMessage] = useState(
-    `Hi! You have been invited to join NOT A EKKI. Click the link to get started: ${inviteLink}`
+    `Hi! You have been invited to join NOT A REKKI. Click the link to get started: ${inviteLink}`
   );
 
   useEffect(() => {
-    setMessage(`Hi! You have been invited to join NOT A EKKI. Click the link to get started: ${inviteLink}`);
+    setMessage(`Hi! You have been invited to join NOT A REKKI. Click the link to get started: ${inviteLink}`);
   }, [inviteLink, open]);
 
   const isSendDisabled = number.replace(/\D/g, '').length < 8;
@@ -176,7 +176,7 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
           fontSize: 15,
           color: '#213254'
         }}>
-          <b>Add customer to NOT A EKKI via SMS</b>
+          <b>Add customer to NOT A REKKI via SMS</b>
           <br />
           <span style={{ color: '#3e68bd', fontWeight: 600 }}>
             add your customer’s details and product list to help them onboard faster – it’s free
@@ -208,7 +208,7 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
           <b>Share set up link</b>
           <br />
           <span style={{ color: '#3e68bd', fontWeight: 600 }}>
-            onboard your customers to NOT A EKKI by sharing this link – you can also paste it in your email signature or share it on social media
+            onboard your customers to NOT A REKKI by sharing this link – you can also paste it in your email signature or share it on social media
           </span>
           <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
             <input
@@ -251,7 +251,7 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
           boxShadow: '0 2px 12px rgba(33,50,84,0.07)'
         }}>
           <div style={{ fontWeight: 900, fontSize: 22, color: '#213254', marginBottom: 8 }}>
-            Welcome to <span style={{ color: '#61dafb' }}>NOT A EKKI</span>
+            Welcome to <span style={{ color: '#61dafb' }}>NOT A REKKI</span>
           </div>
           <div style={{ fontWeight: 600, color: '#3e68bd', fontSize: 16, marginBottom: 8 }}>
             The free ordering app for chefs

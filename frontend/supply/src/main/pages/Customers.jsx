@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InviteCustomersModal from '../components/InviteCustomersModal';
 import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle } from '../styles/sharedStyles';
-import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
 
 // Helper to assign status for demo (in real app, status would come from backend)
 function getCustomerStatus(c) {
@@ -104,17 +103,18 @@ function CustomersTable({ customers, onArchive, onRestore, status }) {
 export default function CustomersPage() {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [status, setStatus] = useState('active');
-  const [customerStatuses, setCustomerStatuses] = useState({});
+  const [customers, setCustomers] = useState([]);
 
-  // Get all customers from ordersDb.js
-  const { customers: FAKE_CUSTOMERS } = getOrdersFromCatalogueRows([
-    { name: 'Fake', code: 'F1', price: 1 }
-  ]);
+  // Fetch customers from backend
+  useEffect(() => {
+    fetch('http://localhost:8080/customers')
+      .then(res => res.json())
+      .then(data => setCustomers(Array.isArray(data) ? data : []));
+  }, []);
 
-  // Demo: add fake stats for table
-  const customersWithStats = FAKE_CUSTOMERS.map((c, idx) => {
-    const localStatus = customerStatuses[c.name] || c.status;
-    const isActive = !localStatus || localStatus === 'active';
+  // Add fake stats for table (only for UI, not persisted)
+  const customersWithStats = customers.map((c, idx) => {
+    const isActive = c.status === 'active';
     return {
       ...c,
       pro: isActive && idx % 2 === 0, // Only active can be PRO
@@ -122,21 +122,42 @@ export default function CustomersPage() {
       orders12Weeks: isActive ? (idx === 0 ? 18 : idx === 2 ? 7 : 0) : 0,
       trendProducts: isActive ? (idx === 0 ? '+12%' : idx === 2 ? '-8%' : '0%') : '0%',
       trendSpend: isActive ? (idx === 0 ? '+5%' : idx === 2 ? '-3%' : '0%') : '0%',
-      missingCodes: idx === 1 ? 2 : idx === 2 ? 1 : 0,
-      status: localStatus || getCustomerStatus(c)
+      missingCodes: idx === 1 ? 2 : idx === 2 ? 1 : 0
     };
   });
 
   const filteredCustomers = customersWithStats.filter(c => c.status === status);
 
-  // Archive customer
-  const handleArchive = (name) => {
-    setCustomerStatuses(prev => ({ ...prev, [name]: 'archived' }));
+  // Archive customer (update in DB)
+  const handleArchive = async (name) => {
+    const customer = customers.find(c => c.name === name);
+    if (!customer) return;
+    await fetch(`http://localhost:8080/customers/${customer._id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'archived' })
+    });
+    setCustomers(customers =>
+      customers.map(c =>
+        c._id === customer._id ? { ...c, status: 'archived' } : c
+      )
+    );
   };
 
-  // Restore customer
-  const handleRestore = (name) => {
-    setCustomerStatuses(prev => ({ ...prev, [name]: 'active' }));
+  // Restore customer (update in DB)
+  const handleRestore = async (name) => {
+    const customer = customers.find(c => c.name === name);
+    if (!customer) return;
+    await fetch(`http://localhost:8080/customers/${customer._id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'active' })
+    });
+    setCustomers(customers =>
+      customers.map(c =>
+        c._id === customer._id ? { ...c, status: 'active' } : c
+      )
+    );
   };
 
   // Get supplierName and supplierId from localStorage or context (fallback to empty)
@@ -158,7 +179,7 @@ export default function CustomersPage() {
       }}>
         <div>
           <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
-            onboard your customers to see more orders on NOT A EKKI
+            onboard your customers to see more orders on NOT A REKKI
           </div>
           <div style={{ color: '#3e68bd', fontWeight: 600, fontSize: 15 }}>
             it is completely free and means that you can manage all your orders in one place

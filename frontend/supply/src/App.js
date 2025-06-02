@@ -40,7 +40,7 @@ function AuthWrapper({ setToken, showRegister, setShowRegister }) {
               className="not-a-ekki-text"
               style={{ color: textColor }}
             >
-              NOT A EKKI
+              NOT A REKKI
             </span>
             <div
               className="not-a-ekki-bar"

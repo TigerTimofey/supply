@@ -368,11 +368,21 @@ export default function Main({ token, onLogout }) {
       userIdDecoded = JSON.parse(atob(payload)).userId;
     } catch {}
     setUserId(userIdDecoded);
-    // Fetch user info
+
+    // Only fetch supplierName if userIdDecoded is present
     if (userIdDecoded) {
       fetch(`http://localhost:8080/users/${userIdDecoded}`)
-        .then(res => res.json())
-        .then(user => setSupplierName(user.supplierName));
+        .then(res => {
+          if (!res.ok) return null;
+          return res.json();
+        })
+        .then(user => {
+          if (user && user.supplierName) setSupplierName(user.supplierName);
+          else setSupplierName('');
+        })
+        .catch(() => setSupplierName(''));
+    } else {
+      setSupplierName('');
     }
   }, [token]);
 
@@ -407,7 +417,7 @@ export default function Main({ token, onLogout }) {
             style={navBrandStyle}
             onClick={() => setActivePage('catalogue')}
           >
-            NOT A EKKI
+            NOT A REKKI
           </span>
           <div className="main-nav-menu" style={navMenuStyle}>
             {NAV_PAGES.map(page => (

@@ -217,7 +217,7 @@ export default function Orders({ catalogueRows }) {
         <div>
           <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
             {isMobile
-              ? 'onboard your customers to see more orders on NOT A EKKI'
+              ? 'onboard your customers to see more orders on NOT A REKKI'
               : 'onboard your customers to see more orders on REKKI'}
           </div>
           {!isMobile && (
