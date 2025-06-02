@@ -479,7 +479,7 @@ function Catalogue({ token }) {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
+    <div style={{ maxWidth: '1900', margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
       {/* Info icon, file upload, and file name */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
