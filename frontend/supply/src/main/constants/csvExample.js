@@ -1,0 +1,1 @@
+export const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market`;

@@ -1,280 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import jwt_decode from "jwt-decode";
-
-const NAV_PAGES = [
-  { label: 'Catalogue', key: 'catalogue' },
-  { label: 'Marketing', key: 'marketing' },
-  { label: 'Orders', key: 'orders' },
-  { label: 'Customers', key: 'customers' },
-  { label: 'Payments', key: 'payments' },
-  { label: 'Chat', key: 'chat' }
-  // Removed Supplier Data from nav menu
-];
-
-const CSV_FIELDS = [
-  { key: 'code', label: 'Code' },
-  { key: 'name', label: 'Name' },
-  { key: 'description', label: 'Description' },
-  { key: 'size', label: 'Size' },
-  { key: 'order_unit', label: 'Order Unit' },
-  { key: 'price', label: 'Price' },
-  { key: 'price_per_measure', label: 'Price per Measure' },
-  { key: 'price_measure_unit', label: 'Price Measure Unit' },
-  { key: 'optional_hide_from_market', label: 'Hide from Market' }
-];
-
-function ConfirmModal({ open, onClose, onConfirm, text, confirmLabel = "Yes, clear history" }) {
-  if (!open) return null;
-  return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-      background: 'rgba(0,0,0,0.25)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center'
-    }}>
-      <div style={{
-        background: '#fff', borderRadius: 12, padding: 32, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 32px rgba(0,0,0,0.15)', position: 'relative'
-      }}>
-        <h3 style={{ marginTop: 0, color: '#213254', fontSize: 20 }}>Are you sure?</h3>
-        <div style={{ marginBottom: 24, color: '#444', fontSize: 15 }}>{text}</div>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
-          <button
-            onClick={onClose}
-            style={{
-              background: '#f0f4f8',
-              color: '#213254',
-              border: '1px solid #d1d5db',
-              borderRadius: 5,
-              padding: '6px 18px',
-              fontWeight: 500,
-              fontSize: 15,
-              cursor: 'pointer'
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              background: '#61dafb',
-              color: '#213254',
-              border: 'none',
-              borderRadius: 5,
-              padding: '6px 18px',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer'
-            }}
-          >
-            {confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CatalogueStats({ rows, history, onShowHistory }) {
-  const total = rows.length && rows[0].code ? rows.length : 0;
-  const priceCount = rows.filter(r => r.price && r.price !== '0' && r.price !== '').length;
-  const hasHistory = Array.isArray(history) && history.length > 0;
-
-  return (
-    <div style={{
-      display: 'flex',
-      gap: 24,
-      marginBottom: 32,
-      flexWrap: 'wrap',
-      justifyContent: 'space-between'
-    }}>
-      <div style={{
-        flex: '1 1 200px',
-        background: '#f7fafd',
-        borderRadius: 12,
-        padding: '24px 18px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        minWidth: 200,
-        textAlign: 'left'
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>0% of products updated in the last 2 weeks</div>
-        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>0 OUT OF {total}</div>
-      </div>
-      <div style={{
-        flex: '1 1 200px',
-        background: '#f7fafd',
-        borderRadius: 12,
-        padding: '24px 18px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        minWidth: 200,
-        textAlign: 'left'
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
-          {total === 0 ? '0%' : `${Math.round((priceCount / total) * 100)}%`} of products have prices
-        </div>
-        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>{priceCount} OUT OF {total}</div>
-      </div>
-      <div style={{
-        flex: '1 1 200px',
-        background: '#f7fafd',
-        borderRadius: 12,
-        padding: '24px 18px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        minWidth: 200,
-        textAlign: 'left'
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
-          0% of products have pictures
-        </div>
-        <div style={{ color: '#213254', fontWeight: 700, fontSize: 16 }}>0 OUT OF {total}</div>
-      </div>
-      <div style={{
-        flex: '1 1 200px',
-        background: '#f7fafd',
-        borderRadius: 12,
-        padding: '24px 18px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        minWidth: 200,
-        textAlign: 'left',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Revert catalogue</div>
-        {hasHistory ? (
-          <div
-            style={{
-              color: '#213254',
-              fontWeight: 700,
-              fontSize: 16,
-              marginBottom: 8,
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-            onClick={onShowHistory}
-            tabIndex={0}
-            role="button"
-            title="Show History & Revert"
-          >
-            Show History & Revert
-          </div>
-        ) : (
-          <div style={{ color: '#213254', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
-            NO PREVIOUS VERSIONS AVAILABLE
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function CatalogueHistoryModal({ open, onClose, history, onRevert, onClearHistory }) {
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingRevert, setPendingRevert] = useState(null);
-
-  const handleRevert = (h) => {
-    setPendingRevert(h);
-  };
-
-  const handleConfirmRevert = () => {
-    if (pendingRevert) {
-      onRevert(pendingRevert);
-      setPendingRevert(null);
-    }
-  };
-
-  if (!open) return null;
-  return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-      background: 'rgba(0,0,0,0.25)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center'
-    }}>
-      <div style={{
-        background: '#fff', borderRadius: 12, padding: 32, minWidth: 340, maxWidth: 500, boxShadow: '0 4px 32px rgba(0,0,0,0.15)', position: 'relative'
-      }}>
-        <button onClick={onClose} style={{
-          position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#213254', cursor: 'pointer'
-        }}>×</button>
-        <h3 style={{ marginTop: 0, color: '#213254' }}>Catalogue History</h3>
-        {(!history || history.length === 0) ? (
-          <div style={{ color: '#888' }}>No history available.</div>
-        ) : (
-          <>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {history.slice().reverse().map((h, i) => (
-                <li key={i} style={{ marginBottom: 18, borderBottom: '1px solid #eee', paddingBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>
-                    <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b>
-                    {h.fileName ? ` "${h.fileName}"` : ''}
-                    <span style={{ color: '#888', marginLeft: 8, fontSize: 13 }}>
-                      {h.date ? new Date(h.date).toLocaleString() : ''}
-                    </span>
-                  </span>
-                  {h.action === 'added' && (
-                    <button
-                      onClick={() => handleRevert(h)}
-                      style={{
-                        marginLeft: 10,
-                        background: '#61dafb',
-                        color: '#213254',
-                        border: 'none',
-                        borderRadius: 5,
-                        padding: '2px 10px',
-                        fontWeight: 700,
-                        fontSize: 13,
-                        cursor: 'pointer'
-                      }}
-                      title="Revert to this version"
-                    >
-                      Revert
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => setShowConfirm(true)}
-              style={{
-                marginTop: 8,
-                background: '#f0f4f8',
-                color: '#213254',
-                border: '1px solid #d1d5db',
-                borderRadius: 5,
-                padding: '4px 12px',
-                fontWeight: 500,
-                fontSize: 13,
-                cursor: 'pointer',
-                width: '100%',
-                marginBottom: 8,
-                transition: 'background 0.15s, color 0.15s, border 0.15s'
-              }}
-              title="Clear all history"
-            >
-              Clear History
-            </button>
-            <ConfirmModal
-              open={showConfirm}
-              onClose={() => setShowConfirm(false)}
-              onConfirm={() => {
-                setShowConfirm(false);
-                onClearHistory();
-              }}
-              text="This will permanently remove all catalogue history for this user. Are you sure?"
-            />
-            <ConfirmModal
-              open={!!pendingRevert}
-              onClose={() => setPendingRevert(null)}
-              onConfirm={handleConfirmRevert}
-              text={
-                pendingRevert
-                  ? `Are you sure you want to revert to "${pendingRevert.fileName}" from ${pendingRevert.date ? new Date(pendingRevert.date).toLocaleString() : ''}?`
-                  : ''
-              }
-              confirmLabel="Yes, revert"
-            />
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+import { NAV_PAGES } from './constants/navPages';
+import { CSV_FIELDS } from './constants/csvFields';
+import { csvExample } from './constants/csvExample';
+import CatalogueStats from './components/CatalogueStats';
+import CatalogueHistoryModal from './components/CatalogueHistoryModal';
 
 function Catalogue({ token }) {
   const [rows, setRows] = useState([
@@ -291,7 +21,7 @@ function Catalogue({ token }) {
     }
   ]);
   const [search, setSearch] = useState('');
-  const [codeSearch, setCodeSearch] = useState('');
+  const [codeSearch] = useState('');
   const [priceSort, setPriceSort] = useState(null);
   const [codeSort, setCodeSort] = useState(null); 
   const [infoOpen, setInfoOpen] = useState(false);
@@ -365,9 +95,6 @@ function Catalogue({ token }) {
       body: JSON.stringify({ csv: csvString, csvName: fileName })
     });
   };
-
-  const csvExample = `code;name;description;size;order_unit;price;price_per_measure;price_measure_unit;optional_hide_from_market
-`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(csvExample);
@@ -1989,11 +1716,6 @@ export default function Main({ token, onLogout }) {
     window.location.href = '/';
   };
 
-  // Add handler for supplier data
-  const handleSupplierData = () => {
-    window.open('/supplier-data.jsx', '_blank');
-  };
-
   // Responsive: show burger menu on mobile
   return (
     <div>
@@ -2277,7 +1999,6 @@ export default function Main({ token, onLogout }) {
             {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
           </h2>
         )}
-        {/* Main content for the selected page can go here */}
       </div>
       <style>
         {`
