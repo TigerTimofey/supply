@@ -22,7 +22,7 @@ const CSV_FIELDS = [
   { key: 'optional_hide_from_market', label: 'Hide from Market' }
 ];
 
-function ConfirmModal({ open, onClose, onConfirm, text }) {
+function ConfirmModal({ open, onClose, onConfirm, text, confirmLabel = "Yes, clear history" }) {
   if (!open) return null;
   return (
     <div style={{
@@ -63,7 +63,7 @@ function ConfirmModal({ open, onClose, onConfirm, text }) {
               cursor: 'pointer'
             }}
           >
-            Yes, clear history
+            {confirmLabel}
           </button>
         </div>
       </div>
@@ -71,11 +71,10 @@ function ConfirmModal({ open, onClose, onConfirm, text }) {
   );
 }
 
-function CatalogueStats({ rows, history, onRevert, onClearHistory }) {
+function CatalogueStats({ rows, history, onShowHistory }) {
   const total = rows.length && rows[0].code ? rows.length : 0;
   const priceCount = rows.filter(r => r.price && r.price !== '0' && r.price !== '').length;
   const hasHistory = Array.isArray(history) && history.length > 0;
-  const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div style={{
@@ -138,73 +137,22 @@ function CatalogueStats({ rows, history, onRevert, onClearHistory }) {
         justifyContent: 'space-between'
       }}>
         <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Revert catalogue</div>
-        
         {hasHistory ? (
-          <div style={{ color: '#213254', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
+          <div
+            style={{
+              color: '#213254',
+              fontWeight: 700,
+              fontSize: 16,
+              marginBottom: 8,
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+            onClick={onShowHistory}
+            tabIndex={0}
+            role="button"
+            title="Show History & Revert"
+          >
             Show History & Revert
-            <div style={{ marginTop: 10, maxHeight: 120, overflowY: 'auto', fontWeight: 400, fontSize: 14 }}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {history.slice().reverse().map((h, i) => (
-                  <li key={i} style={{ marginBottom: 8, borderBottom: '1px solid #eee', paddingBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span>
-                      <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b>
-                      {h.fileName ? ` "${h.fileName}"` : ''}
-                      <span style={{ color: '#888', marginLeft: 6, fontSize: 12 }}>
-                        {h.date ? new Date(h.date).toLocaleString() : ''}
-                      </span>
-                    </span>
-                    {h.action === 'added' && (
-                      <button
-                        onClick={() => onRevert(h)}
-                        style={{
-                          marginLeft: 10,
-                          background: '#61dafb',
-                          color: '#213254',
-                          border: 'none',
-                          borderRadius: 5,
-                          padding: '2px 10px',
-                          fontWeight: 700,
-                          fontSize: 13,
-                          cursor: 'pointer'
-                        }}
-                        title="Revert to this version"
-                      >
-                        Revert
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => setShowConfirm(true)}
-                style={{
-                  marginTop: 8,
-                  background: '#f0f4f8',
-                  color: '#213254',
-                  border: '1px solid #d1d5db',
-                  borderRadius: 5,
-                  padding: '4px 12px',
-                  fontWeight: 500,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  width: '100%',
-                  marginBottom: 8,
-                  transition: 'background 0.15s, color 0.15s, border 0.15s'
-                }}
-                title="Clear all history"
-              >
-                Clear History
-              </button>
-              <ConfirmModal
-                open={showConfirm}
-                onClose={() => setShowConfirm(false)}
-                onConfirm={() => {
-                  setShowConfirm(false);
-                  onClearHistory();
-                }}
-                text="This will permanently remove all catalogue history for this user. Are you sure?"
-              />
-            </div>
           </div>
         ) : (
           <div style={{ color: '#213254', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
@@ -216,27 +164,20 @@ function CatalogueStats({ rows, history, onRevert, onClearHistory }) {
   );
 }
 
-function CatalogueHistoryModal({ open, onClose, token }) {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+function CatalogueHistoryModal({ open, onClose, history, onRevert, onClearHistory }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingRevert, setPendingRevert] = useState(null);
 
-  let userId = '';
-  try {
-    userId = jwt_decode(token).userId;
-  } catch {}
+  const handleRevert = (h) => {
+    setPendingRevert(h);
+  };
 
-  useEffect(() => {
-    if (open && userId) {
-      setLoading(true);
-      fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
-        .then(res => res.json())
-        .then(data => {
-          setHistory(Array.isArray(data) ? data : []);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+  const handleConfirmRevert = () => {
+    if (pendingRevert) {
+      onRevert(pendingRevert);
+      setPendingRevert(null);
     }
-  }, [open, userId]);
+  };
 
   if (!open) return null;
   return (
@@ -251,23 +192,83 @@ function CatalogueHistoryModal({ open, onClose, token }) {
           position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 22, color: '#213254', cursor: 'pointer'
         }}>×</button>
         <h3 style={{ marginTop: 0, color: '#213254' }}>Catalogue History</h3>
-        {loading ? (
-          <div>Loading...</div>
-        ) : history.length === 0 ? (
+        {(!history || history.length === 0) ? (
           <div style={{ color: '#888' }}>No history available.</div>
         ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {history.slice().reverse().map((h, i) => (
-              <li key={i} style={{ marginBottom: 18, borderBottom: '1px solid #eee', paddingBottom: 10 }}>
-                <div>
-                  <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b> {h.fileName ? `file "${h.fileName}"` : ''} 
-                  <span style={{ color: '#888', marginLeft: 8, fontSize: 13 }}>
-                    {h.date ? new Date(h.date).toLocaleString() : ''}
+          <>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {history.slice().reverse().map((h, i) => (
+                <li key={i} style={{ marginBottom: 18, borderBottom: '1px solid #eee', paddingBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>
+                    <b>{h.action.charAt(0).toUpperCase() + h.action.slice(1)}</b>
+                    {h.fileName ? ` "${h.fileName}"` : ''}
+                    <span style={{ color: '#888', marginLeft: 8, fontSize: 13 }}>
+                      {h.date ? new Date(h.date).toLocaleString() : ''}
+                    </span>
                   </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+                  {h.action === 'added' && (
+                    <button
+                      onClick={() => handleRevert(h)}
+                      style={{
+                        marginLeft: 10,
+                        background: '#61dafb',
+                        color: '#213254',
+                        border: 'none',
+                        borderRadius: 5,
+                        padding: '2px 10px',
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: 'pointer'
+                      }}
+                      title="Revert to this version"
+                    >
+                      Revert
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => setShowConfirm(true)}
+              style={{
+                marginTop: 8,
+                background: '#f0f4f8',
+                color: '#213254',
+                border: '1px solid #d1d5db',
+                borderRadius: 5,
+                padding: '4px 12px',
+                fontWeight: 500,
+                fontSize: 13,
+                cursor: 'pointer',
+                width: '100%',
+                marginBottom: 8,
+                transition: 'background 0.15s, color 0.15s, border 0.15s'
+              }}
+              title="Clear all history"
+            >
+              Clear History
+            </button>
+            <ConfirmModal
+              open={showConfirm}
+              onClose={() => setShowConfirm(false)}
+              onConfirm={() => {
+                setShowConfirm(false);
+                onClearHistory();
+              }}
+              text="This will permanently remove all catalogue history for this user. Are you sure?"
+            />
+            <ConfirmModal
+              open={!!pendingRevert}
+              onClose={() => setPendingRevert(null)}
+              onConfirm={handleConfirmRevert}
+              text={
+                pendingRevert
+                  ? `Are you sure you want to revert to "${pendingRevert.fileName}" from ${pendingRevert.date ? new Date(pendingRevert.date).toLocaleString() : ''}?`
+                  : ''
+              }
+              confirmLabel="Yes, revert"
+            />
+          </>
         )}
       </div>
     </div>
@@ -299,6 +300,7 @@ function Catalogue({ token }) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [hasHistory, setHasHistory] = useState(false);
   const [history, setHistory] = useState([]);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const infoTimeout = useRef();
 
   // Get userId from token
@@ -419,13 +421,11 @@ function Catalogue({ token }) {
   // Revert to a previous catalogue version
   const revertCatalogue = async (historyEntry) => {
     if (!userId || !historyEntry.csv) return;
-    // Save selected version as current
     await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ csv: historyEntry.csv, csvName: historyEntry.fileName })
     });
-    // Refresh UI
     setFileName(historyEntry.fileName);
     const lines = historyEntry.csv.trim().split('\n');
     if (lines.length) {
@@ -440,10 +440,10 @@ function Catalogue({ token }) {
       });
       setRows(newRows);
     }
-    // Optionally, reload history
     fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
       .then(res => res.json())
       .then(data => setHistory(Array.isArray(data) ? data : []));
+    setHistoryModalOpen(false);
   };
 
   // Clear all history
@@ -453,6 +453,7 @@ function Catalogue({ token }) {
       method: 'DELETE'
     });
     setHistory([]);
+    setHistoryModalOpen(false);
   };
 
   // Filtering logic
@@ -479,7 +480,7 @@ function Catalogue({ token }) {
   }
 
   return (
-    <div style={{ maxWidth: '1900', margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
+    <div style={{ maxWidth: 1900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
       {/* Info icon, file upload, and file name */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
@@ -618,9 +619,12 @@ function Catalogue({ token }) {
           </span>
         </div>
       </div>
-       <div style={{ width: '100%', height: 1, background: '#e0e0e0', margin: '24px 0' }} />
       {/* Sticker cards between file upload and catalogue data */}
-      <CatalogueStats rows={rows} history={history} onRevert={revertCatalogue} onClearHistory={clearHistory} />
+      <CatalogueStats
+        rows={rows}
+        history={history}
+        onShowHistory={() => setHistoryModalOpen(true)}
+      />
       {/* Divider line */}
       <div style={{ width: '100%', height: 1, background: '#e0e0e0', margin: '24px 0' }} />
       {/* Search input in its own div */}
@@ -714,7 +718,13 @@ function Catalogue({ token }) {
           </table>
         </div>
       </div>
-      <CatalogueHistoryModal open={historyOpen} onClose={() => setHistoryOpen(false)} token={token} />
+      <CatalogueHistoryModal
+        open={historyModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+        history={history}
+        onRevert={revertCatalogue}
+        onClearHistory={clearHistory}
+      />
     </div>
   );
 }
