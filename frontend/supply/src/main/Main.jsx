@@ -3,6 +3,7 @@ import jwt_decode from "jwt-decode";
 import { NAV_PAGES } from './constants/navPages';
 import { CSV_FIELDS } from './constants/csvFields';
 import { csvExample } from './constants/csvExample';
+import { CATEGORY_OPTIONS } from './constants/categoryOptions';
 import CatalogueStats from './components/CatalogueStats';
 import CatalogueHistoryModal from './components/CatalogueHistoryModal';
 
@@ -28,7 +29,6 @@ function Catalogue({ token }) {
   const [copied, setCopied] = useState(false);
   const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [historyOpen, setHistoryOpen] = useState(false);
   const [hasHistory, setHasHistory] = useState(false);
   const [history, setHistory] = useState([]);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
@@ -544,18 +544,6 @@ function SupplierDataModal({ open, onClose, userId }) {
 
   if (!open) return null;
 
-  const CATEGORY_OPTIONS = [
-    'alcohol',
-    'bakery',
-    'coffe and tea',
-    'fish and seafood',
-    'dairy',
-    'drinks',
-    'pallets',
-    'supplies',
-    'frozen meat',
-    'toys'
-  ];
 
   const inputStyle = {
     fontWeight: 500,
