@@ -7,6 +7,7 @@ import CatalogueStats from './components/catalogues-logic/CatalogueStats';
 import CatalogueHistoryModal from './components/catalogues-logic/CatalogueHistoryModal';
 import SupplierDataModal from './components/supplier-modal/SupplierDataModal';
 import Orders from './pages/Orders';
+import CustomersPage from './pages/Customers';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -515,6 +516,8 @@ export default function Main({ token, onLogout }) {
           <Catalogue token={token} setRows={setRows} rows={rows} />
         ) : activePage === 'orders' ? (
           <Orders catalogueRows={rows} />
+        ) : activePage === 'customers' ? (
+          <CustomersPage />
         ) : activePage === 'supplier-data' ? (
           // No longer used as a page, keep fallback for safety
           <></>

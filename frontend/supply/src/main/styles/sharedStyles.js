@@ -124,7 +124,7 @@ export const tableStyle = {
 
 export const thStyle = {
   border: '1px solid #e0e0e0',
-  padding: 10,
+  padding: 15,
   background: '#f7fafd',
   fontWeight: 700,
   position: 'relative'
