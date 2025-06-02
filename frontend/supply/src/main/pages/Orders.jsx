@@ -125,12 +125,23 @@ export default function Orders({ catalogueRows }) {
   const [modalOrder, setModalOrder] = useState(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [customers, setCustomers] = useState([]);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 700 : false
+  );
 
   // Fetch customers from backend
   useEffect(() => {
     fetch('http://localhost:8080/customers')
       .then(res => res.json())
       .then(data => setCustomers(Array.isArray(data) ? data : []));
+  }, []);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 700);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Get orders/customers/days from catalogueRows and fetched customers
@@ -204,9 +215,6 @@ export default function Orders({ catalogueRows }) {
     )
   );
 
-  // Responsive: show stacked cards on mobile, table on desktop
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;
-
   return (
     <div style={catalogueContainerStyle}>
       {/* Onboard banner */}
@@ -225,8 +233,8 @@ export default function Orders({ catalogueRows }) {
         <div>
           <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
             {isMobile
-              ? 'onboard your customers to see more orders on NOT A REKKI'
-              : 'onboard your customers to see more orders on REKKI'}
+              ? 'Onboard your customers to see more orders on NOT A REKKI'
+              : 'Onboard your customers to see more orders on REKKI'}
           </div>
           {!isMobile && (
             <div style={{ color: '#3e68bd', fontWeight: 600, fontSize: 15 }}>
@@ -281,7 +289,7 @@ export default function Orders({ catalogueRows }) {
               {filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={DAYS ? DAYS.length + 1 : 5} style={{ color: '#888', padding: 24, textAlign: 'center' }}>
-                    onboard your customers to see more orders on NOT A REKKI<br />
+                    Onboard your customers to see more orders on NOT A REKKI<br />
                     <span style={{ color: '#3e68bd', fontWeight: 600 }}>
                       it is completely free and means that you can manage all your orders in one place
                     </span>
@@ -352,7 +360,7 @@ export default function Orders({ catalogueRows }) {
           <div>
             {filteredCustomers.length === 0 ? (
               <div style={{ color: '#888', padding: 24, textAlign: 'center' }}>
-                onboard your customers to see more orders on NOT A REKKI<br />
+                Onboard your customers to see more orders on NOT A REKKI<br />
                 <span style={{ color: '#3e68bd', fontWeight: 600 }}>
                   it is completely free and means that you can manage all your orders in one place
                 </span>

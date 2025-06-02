@@ -10,7 +10,83 @@ function getCustomerStatus(c) {
 }
 
 function CustomersTable({ customers, onArchive, onRestore, status }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;
   if (!customers.length) return null;
+
+  if (isMobile) {
+    return (
+      <div style={{ marginBottom: 32 }}>
+        {customers.map((c, i) => (
+          <div
+            key={c.name}
+            style={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 10,
+              marginBottom: 18,
+              padding: 16,
+              background: '#f7fafd'
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{c.name}</div>
+            <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>
+              {c.status === 'active' && c.pro ? (
+                <span style={{ color: '#1ca21c', fontWeight: 700 }}>PRO</span>
+              ) : (
+                <span style={{ color: '#888' }}>—</span>
+              )}
+            </div>
+            <div style={{ fontSize: 14, marginBottom: 4 }}>
+              <b>Orders this week:</b> {c.ordersThisWeek}
+            </div>
+            <div style={{ fontSize: 14, marginBottom: 4 }}>
+              <b>Orders past 12 weeks:</b> {c.orders12Weeks}
+            </div>
+            <div style={{ fontSize: 14, marginBottom: 4 }}>
+              <b>Trend products 12w:</b> {c.trendProducts}
+            </div>
+            <div style={{ fontSize: 14, marginBottom: 4 }}>
+              <b>Trend spend 12w:</b> {c.trendSpend}
+            </div>
+            <div style={{ fontSize: 14, marginBottom: 4 }}>
+              <b>Missing codes:</b> {c.missingCodes}
+            </div>
+            <div style={{ marginTop: 10 }}>
+              {status === 'active' && (
+                <button
+                  style={{
+                    ...saveBtnStyle,
+                    background: '#f0f4f8',
+                    color: '#e74c3c',
+                    fontSize: 13,
+                    padding: '6px 12px'
+                  }}
+                  onClick={() => onArchive(c.name)}
+                >
+                  Archive
+                </button>
+              )}
+              {status === 'archived' && (
+                <button
+                  style={{
+                    ...saveBtnStyle,
+                    background: '#e6fbe6',
+                    color: '#1ca21c',
+                    fontSize: 13,
+                    padding: '6px 12px'
+                  }}
+                  onClick={() => onRestore(c.name)}
+                >
+                  Restore
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Desktop/tablet view
   return (
     <div style={{ marginBottom: 32 }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', fontSize: 15 }}>
@@ -173,29 +249,31 @@ export default function CustomersPage() {
         padding: '18px 24px',
         marginBottom: 28,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 18
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 10
       }}>
         <div>
           <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
-            onboard your customers to see more orders on NOT A REKKI
+            Onboard your customers to see more orders on NOT A REKKI
           </div>
           <div style={{ color: '#3e68bd', fontWeight: 600, fontSize: 15 }}>
             it is completely free and means that you can manage all your orders in one place
           </div>
         </div>
-        <button
-          style={{
-            ...saveBtnStyle,
-            minWidth: 160,
-            fontSize: 16,
-            padding: '10px 22px'
-          }}
-          onClick={() => setInviteModalOpen(true)}
-        >
-          Set up customer
-        </button>
+        <div style={{ display: 'flex', gap: 16, marginTop: 14 }}>
+          <button
+            style={{
+              ...saveBtnStyle,
+              minWidth: 160,
+              fontSize: 16,
+              padding: '10px 22px'
+            }}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            Set up customer
+          </button>
+        </div>
       </div>
       <InviteCustomersModal
         open={inviteModalOpen}
@@ -204,12 +282,22 @@ export default function CustomersPage() {
         supplierId={supplierId}
       />
       <h2 style={{ color: '#213254', marginBottom: 18 }}>Customers</h2>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 15,
+          marginBottom: 24,
+          flexWrap: 'wrap',
+          width: '100%'
+        }}
+      >
         <button
           style={{
             ...saveBtnStyle,
             background: status === 'active' ? '#61dafb' : '#f0f4f8',
-            color: status === 'active' ? '#213254' : '#888'
+            color: status === 'active' ? '#213254' : '#888',
+            flex: 1,
+            minWidth: 120
           }}
           onClick={() => setStatus('active')}
         >
@@ -219,7 +307,9 @@ export default function CustomersPage() {
           style={{
             ...saveBtnStyle,
             background: status === 'pending' ? '#61dafb' : '#f0f4f8',
-            color: status === 'pending' ? '#213254' : '#888'
+            color: status === 'pending' ? '#213254' : '#888',
+            flex: 1,
+            minWidth: 120
           }}
           onClick={() => setStatus('pending')}
         >
@@ -229,7 +319,9 @@ export default function CustomersPage() {
           style={{
             ...saveBtnStyle,
             background: status === 'archived' ? '#61dafb' : '#f0f4f8',
-            color: status === 'archived' ? '#213254' : '#888'
+            color: status === 'archived' ? '#213254' : '#888',
+            flex: 1,
+            minWidth: 120
           }}
           onClick={() => setStatus('archived')}
         >
