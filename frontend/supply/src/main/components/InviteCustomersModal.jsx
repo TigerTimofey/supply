@@ -4,13 +4,104 @@ import {
   modalStyle,
   closeBtnStyle,
   saveBtnStyle,
-  dividerLineStyle
+  dividerLineStyleModal
 } from '../styles/sharedStyles';
+
+// SMS Invite Modal with editable message
+function SmsInviteModal({ open, onClose, inviteLink }) {
+  const [number, setNumber] = useState('');
+  const [message, setMessage] = useState(
+    `Hi! You have been invited to join NOT A EKKI. Click the link to get started: ${inviteLink}`
+  );
+
+  useEffect(() => {
+    setMessage(`Hi! You have been invited to join NOT A EKKI. Click the link to get started: ${inviteLink}`);
+  }, [inviteLink, open]);
+
+  const isSendDisabled = number.replace(/\D/g, '').length < 8;
+
+  if (!open) return null;
+  return (
+    <div style={{
+      ...modalOverlayStyle(),
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(33,50,84,0.18)',
+          padding: 32,
+          minWidth: 0,
+          width: 400,
+          maxWidth: '95vw',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          position: 'relative'
+        }}
+      >
+        <button onClick={onClose} style={{ ...closeBtnStyle, top: 10, right: 10 }} aria-label="Close">×</button>
+        <h3 style={{ color: '#213254', marginBottom: 14, fontWeight: 900, fontSize: 20, width: '100%', textAlign: 'center' }}>
+          Invite customer via SMS
+        </h3>
+        <input
+          type="tel"
+          placeholder="Enter phone number"
+          value={number}
+          onChange={e => setNumber(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '10px 14px',
+            borderRadius: 8,
+            border: '1.5px solid #61dafb',
+            fontSize: 15,
+            marginBottom: 12
+          }}
+        />
+        <textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          rows={5}
+          style={{
+            width: '100%',
+            borderRadius: 8,
+            border: '1.5px solid #61dafb',
+            fontSize: 15,
+            padding: '10px 12px',
+            marginBottom: 12,
+            resize: 'vertical',
+            minHeight: 90
+          }}
+        />
+        <div style={{ color: '#888', fontSize: 13, marginBottom: 10, textAlign: 'center' }}>
+          This is the SMS text your customer will receive (editable).
+        </div>
+        <button
+          style={{
+            ...saveBtnStyle,
+            width: '100%',
+            fontSize: 16,
+            opacity: isSendDisabled ? 0.5 : 1,
+            cursor: isSendDisabled ? 'not-allowed' : 'pointer'
+          }}
+          onClick={onClose}
+          disabled={isSendDisabled}
+        >
+          Send invite
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function InviteCustomersModal({ open, onClose, supplierId: propSupplierId, supplierName: propSupplierName }) {
   const [copied, setCopied] = useState(false);
   const [supplierId, setSupplierId] = useState('');
   const [supplierName, setSupplierName] = useState('');
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
 
   // Fetch supplier data if not provided via props
   useEffect(() => {
@@ -91,18 +182,16 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
             add your customer’s details and product list to help them onboard faster – it’s free
           </span>
         </div>  
-           <div style={{ margin: '18px 0 10px 0', width: '100%' }}>
+        <div style={{ margin: '18px 0 10px 0', width: '100%' }}>
           <button
             style={{ ...saveBtnStyle, width: '100%', fontSize: 16, marginBottom: 40 }}
-            onClick={() => {
-              // TODO: Implement invite customers functionality
-              alert('Invite customers functionality coming soon!');
-            }}
+            onClick={() => setSmsModalOpen(true)}
           >
             Invite customers
           </button>
         </div>
- <div style={dividerLineStyle} />
+        <SmsInviteModal open={smsModalOpen} onClose={() => setSmsModalOpen(false)} inviteLink={INVITE_LINK} />
+        <div style={dividerLineStyleModal} />
 
          <h3 style={{ color: '#213254', marginBottom: 12, fontWeight: 900, fontSize: 16, width: '100%', textAlign: 'center' }}>
         VIA LINK
@@ -172,7 +261,17 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
             <br />
             <span style={{ fontWeight: 700, fontSize: 18, color: '#213254' }}>{supplierName || 'Supplier'}</span>
             <br />
-            <span style={{ color: '#3e68bd', fontWeight: 700, fontSize: 15 }}>coffee and tea</span>
+        <button
+              style={{
+                ...saveBtnStyle,
+                marginTop: 12,
+                minWidth: 90,
+                fontSize: 15
+              }}
+              onClick={() => alert('User moved to AppStore')}
+            >
+             CONNECT
+            </button>
           </div>
       
         </div>

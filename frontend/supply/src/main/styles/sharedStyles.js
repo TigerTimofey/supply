@@ -94,6 +94,12 @@ export const dividerLineStyle = {
   background: '#e0e0e0',
   margin: '24px 0'
 };
+export const dividerLineStyleModal = {
+  width: '100%',
+  height: 1,
+  background: '#e0e0e0',
+  margin: '12px 0'
+};
 
 export const searchInputStyle = {
   padding: '8px 12px',
