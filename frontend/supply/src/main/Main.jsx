@@ -38,8 +38,28 @@ import {
   navBurgerCloseBtnStyle,
   navBurgerPageBtnStyle,
   navBurgerProfileBtnStyle,
-  navBurgerLogoutBtnStyle
-} from './sharedStyles';
+  navBurgerLogoutBtnStyle,
+  navDropdownProfileBtnStyle,
+  navDropdownLogoutBtnStyle,
+  inputStyle,
+  fieldRowStyle,
+  labelStyle,
+  buttonGroupStyle,
+  modalStyle,
+  responsiveModalStyle,
+  mobileFieldRowStyle,
+  mobileLabelEditRow,
+  saveBtnStyle,
+  cancelBtnStyle,
+  navBurgerMenuStyle,
+  navBurgerHeaderStyle,
+  navBurgerBrandStyle,
+  modalOverlayStyle,
+  modalHeaderRowStyle,
+  profileHeaderStyle,
+  modalFormStyle,
+  editBtnStyle
+} from './styles/sharedStyles';
 
 // Import utils
 import { saveCatalogue } from './utils/saveCatalogue';
@@ -432,144 +452,59 @@ function SupplierDataModal({ open, onClose, userId }) {
     setSaving(false);
   };
 
+  // Helper for edit/save/cancel button group
+  function renderEditSaveCancel(field, originalValue) {
+    return (
+      <div style={buttonGroupStyle}>
+        {editField !== field && (
+          <button
+            type="button"
+            onClick={() => setEditField(field)}
+            style={editBtnStyle}
+          >Edit</button>
+        )}
+        {editField === field && (
+          <>
+            <button
+              type="button"
+              onClick={() => handleSave(field)}
+              disabled={saving}
+              style={saveBtnStyle}
+            >Save</button>
+            <button
+              type="button"
+              onClick={() => { setEditField(null); setForm(f => ({ ...f, [field]: originalValue })); }}
+              style={cancelBtnStyle}
+            >Cancel</button>
+          </>
+        )}
+      </div>
+    );
+  }
+
   if (!open) return null;
 
-
-  const inputStyle = {
-    fontWeight: 500,
-    border: '1.5px solid #61dafb',
-    borderRadius: 8,
-    padding: '10px 16px',
-    fontSize: 17,
-    background: '#f7fafd',
-    outline: 'none',
-    transition: 'border 0.2s, box-shadow 0.2s',
-    boxShadow: '0 2px 8px rgba(97,218,251,0.10)',
+  // Use shared styles, extend for responsive cases
+  const computedInputStyle = {
+    ...inputStyle,
     width: isMobile ? '90vw' : '100%',
-    minWidth: 0,
     maxWidth: isMobile ? '98vw' : undefined,
-    boxSizing: 'border-box',
-    display: 'block',
     margin: isMobile ? '0 auto' : undefined
   };
-
-  const fieldRowStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 18,
-    minHeight: 54,
-    background: 'rgba(97,218,251,0.07)',
-    borderRadius: 12,
-    padding: '10px 18px'
-  };
-
-  const labelStyle = {
-    fontWeight: 700,
-    color: '#3e68bd',
-    minWidth: 170,
-    flexShrink: 0,
-    fontSize: 16
-  };
-
-  const buttonGroupStyle = {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 8,
-    marginRight: 8
-  };
-
-  // Responsive modal style
-  const modalStyle = {
-    background: 'linear-gradient(120deg, #f7fafd 60%, #e3f0fa 100%)',
-    borderRadius: 22,
-    boxShadow: '0 12px 48px rgba(33,50,84,0.22)',
-    padding: '48px 36px 36px 36px',
-    maxWidth: 720,
-    width: '90vw',
-    minHeight: 700,
-    minWidth: 0,
-    margin: 16,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    position: 'relative',
-    transition: 'width 0.2s, min-height 0.2s',
-    boxSizing: 'border-box'
-  };
-
-  // For mobile: adjust modal style
-  const responsiveModalStyle = isMobile
-    ? {
-        ...modalStyle,
-        padding: '24px 4px 24px 4px',
-        maxWidth: '100vw',
-        width: '100vw',
-        minHeight: 0,
-        margin: 0,
-        borderRadius: 0,
-        top: 0,
-        left: 0,
-        position: 'fixed'
-      }
-    : modalStyle;
-
-  // For mobile: field row style
-  const mobileFieldRowStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 18,
-    minHeight: 54,
-    background: 'rgba(97,218,251,0.07)',
-    borderRadius: 12,
-    padding: '10px 10px',
-  };
-
-  // For mobile: label and edit button row (centered)
-  const mobileLabelEditRow = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    width: '100%',
-    marginBottom: 4,
-    textAlign: 'center'
-  };
+  const computedModalStyle = isMobile
+    ? { ...responsiveModalStyle }
+    : { ...modalStyle };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, width: '100vw', height: '100vh',
-      background: 'rgba(33,50,84,0.22)',
-      zIndex: 4000,
-      display: 'flex',
-      justifyContent: 'center',
-      backdropFilter: 'blur(2px)',
-      overflowY: isMobile ? 'auto' : 'unset'
-    }}>
-      <div style={responsiveModalStyle}>
+    <div style={modalOverlayStyle(isMobile)}>
+      <div style={computedModalStyle}>
         <button
           onClick={onClose}
           style={closeBtnStyle}
           aria-label="Close"
         >×</button>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          justifyContent: 'center',
-          marginBottom: 24,
-          gap: 18
-        }}>
-          <h1 style={{
-            color: '#213254',
-            fontWeight: 900,
-            fontSize: 34,
-            letterSpacing: 1,
-            margin: 0
-          }}>
+        <div style={modalHeaderRowStyle}>
+          <h1 style={profileHeaderStyle}>
             Profile
           </h1>
         </div>
@@ -578,16 +513,7 @@ function SupplierDataModal({ open, onClose, userId }) {
             <span style={{ fontSize: 22, color: '#888' }}>Loading...</span>
           </div>
         ) : (
-          <form
-            style={{
-              width: '100%',
-              marginBottom: 28,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              minHeight: 420
-            }}
-          >
+          <form style={modalFormStyle}>
             {/* Supplier Name */}
             <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
               {isMobile ? (
@@ -598,16 +524,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('supplierName')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
@@ -618,7 +535,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                           name="supplierName"
                           value={form.supplierName}
                           onChange={handleChange}
-                          style={inputStyle}
+                          style={computedInputStyle}
                           required
                           autoFocus
                         />
@@ -627,30 +544,12 @@ function SupplierDataModal({ open, onClose, userId }) {
                             type="button"
                             onClick={() => handleSave('supplierName')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, supplierName: data.supplierName })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </>
@@ -661,57 +560,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'supplierName' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('supplierName')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'supplierName' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('supplierName')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, supplierName: data.supplierName })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('supplierName', data.supplierName)}
                   <span style={labelStyle}>Supplier Name:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'supplierName' ? (
@@ -719,7 +568,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                         name="supplierName"
                         value={form.supplierName}
                         onChange={handleChange}
-                        style={inputStyle}
+                        style={computedInputStyle}
                         required
                         autoFocus
                       />
@@ -740,28 +589,19 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('email')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
                   <div style={{ width: '100%' }}>
                     {editField === 'email' ? (
                       <>
-                        <input 
+                        <input
                           name="email"
                           type="email"
                           value={form.email}
                           onChange={handleChange}
-                          style={inputStyle}
+                          style={computedInputStyle}
                           required
                         />
                         <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
@@ -769,30 +609,12 @@ function SupplierDataModal({ open, onClose, userId }) {
                             type="button"
                             onClick={() => handleSave('email')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, email: data.email })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </>
@@ -803,57 +625,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'email' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('email')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'email' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('email')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, email: data.email })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('email', data.email)}
                   <span style={labelStyle}>Email:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'email' ? (
@@ -862,7 +634,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                         type="email"
                         value={form.email}
                         onChange={handleChange}
-                        style={inputStyle}
+                        style={computedInputStyle}
                         required
                       />
                     ) : (
@@ -882,16 +654,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('accountEmail')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
@@ -903,37 +666,19 @@ function SupplierDataModal({ open, onClose, userId }) {
                           type="email"
                           value={form.accountEmail}
                           onChange={handleChange}
-                          style={inputStyle}
+                          style={computedInputStyle}
                         />
                         <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
                           <button
                             type="button"
                             onClick={() => handleSave('accountEmail')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, accountEmail: data.accountEmail })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </>
@@ -944,57 +689,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'accountEmail' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('accountEmail')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'accountEmail' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('accountEmail')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, accountEmail: data.accountEmail })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('accountEmail', data.accountEmail)}
                   <span style={labelStyle}>Account Email:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'accountEmail' ? (
@@ -1003,7 +698,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                         type="email"
                         value={form.accountEmail}
                         onChange={handleChange}
-                        style={inputStyle}
+                        style={computedInputStyle}
                       />
                     ) : (
                       <span style={{ fontWeight: 500, display: 'inline' }}>{data.accountEmail}</span>
@@ -1022,16 +717,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('salesEmail')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
@@ -1043,37 +729,19 @@ function SupplierDataModal({ open, onClose, userId }) {
                           type="email"
                           value={form.salesEmail}
                           onChange={handleChange}
-                          style={inputStyle}
+                          style={computedInputStyle}
                         />
                         <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
                           <button
                             type="button"
                             onClick={() => handleSave('salesEmail')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, salesEmail: data.salesEmail })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </>
@@ -1084,57 +752,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'salesEmail' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('salesEmail')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'salesEmail' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('salesEmail')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, salesEmail: data.salesEmail })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('salesEmail', data.salesEmail)}
                   <span style={labelStyle}>Sales Email:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'salesEmail' ? (
@@ -1143,7 +761,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                         type="email"
                         value={form.salesEmail}
                         onChange={handleChange}
-                        style={inputStyle}
+                        style={computedInputStyle}
                       />
                     ) : (
                       <span style={{ fontWeight: 500, display: 'inline' }}>{data.salesEmail}</span>
@@ -1162,16 +780,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('origin')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
@@ -1182,37 +791,19 @@ function SupplierDataModal({ open, onClose, userId }) {
                           name="origin"
                           value={form.origin}
                           onChange={handleChange}
-                          style={inputStyle}
+                          style={computedInputStyle}
                         />
                         <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
                           <button
                             type="button"
                             onClick={() => handleSave('origin')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, origin: data.origin })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </>
@@ -1223,57 +814,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'origin' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('origin')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'origin' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('origin')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, origin: data.origin })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('origin', data.origin)}
                   <span style={labelStyle}>Origin:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'origin' ? (
@@ -1281,7 +822,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                         name="origin"
                         value={form.origin}
                         onChange={handleChange}
-                        style={inputStyle}
+                        style={computedInputStyle}
                       />
                     ) : (
                       <span style={{ fontWeight: 500, display: 'inline' }}>{data.origin}</span>
@@ -1300,16 +841,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                       <button
                         type="button"
                         onClick={() => setEditField('productCategories')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
+                        style={editBtnStyle}
                       >Edit</button>
                     )}
                   </div>
@@ -1344,30 +876,12 @@ function SupplierDataModal({ open, onClose, userId }) {
                             type="button"
                             onClick={() => handleSave('productCategories')}
                             disabled={saving}
-                            style={{
-                              background: '#61dafb',
-                              color: '#213254',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 700,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={saveBtnStyle}
                           >Save</button>
                           <button
                             type="button"
                             onClick={() => { setEditField(null); setForm(f => ({ ...f, productCategories: data.productCategories })); }}
-                            style={{
-                              background: '#f0f4f8',
-                              color: '#213254',
-                              border: '1px solid #d1d5db',
-                              borderRadius: 8,
-                              padding: '7px 18px',
-                              fontWeight: 500,
-                              fontSize: 15,
-                              cursor: 'pointer'
-                            }}
+                            style={cancelBtnStyle}
                           >Cancel</button>
                         </div>
                       </span>
@@ -1395,57 +909,7 @@ function SupplierDataModal({ open, onClose, userId }) {
                 </>
               ) : (
                 <>
-                  <div style={buttonGroupStyle}>
-                    {editField !== 'productCategories' && (
-                      <button
-                        type="button"
-                        onClick={() => setEditField('productCategories')}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#3e68bd',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          textDecoration: 'underline',
-                          padding: 0
-                        }}
-                      >Edit</button>
-                    )}
-                    {editField === 'productCategories' && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleSave('productCategories')}
-                          disabled={saving}
-                          style={{
-                            background: '#61dafb',
-                            color: '#213254',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 700,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Save</button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditField(null); setForm(f => ({ ...f, productCategories: data.productCategories })); }}
-                          style={{
-                            background: '#f0f4f8',
-                            color: '#213254',
-                            border: '1px solid #d1d5db',
-                            borderRadius: 8,
-                            padding: '7px 18px',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            cursor: 'pointer'
-                          }}
-                        >Cancel</button>
-                      </>
-                    )}
-                  </div>
+                  {renderEditSaveCancel('productCategories', data.productCategories)}
                   <span style={labelStyle}>Product Categories:</span>
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'productCategories' ? (
@@ -1622,49 +1086,21 @@ export default function Main({ token, onLogout }) {
             {supplierName} ▾
           </button>
           {dropdownOpen && (
-            <div
-              style={navDropdownMenuStyle}
-            >
-              <div
-                style={navDropdownHeaderStyle}
-              >
+            <div style={navDropdownMenuStyle}>
+              <div style={navDropdownHeaderStyle}>
                 {supplierName}
               </div>
               <button
                 onClick={() => setSupplierModalOpen(true)}
-                style={{
-                  width: '100%',
-                  background: 'none',
-                  border: 'none',
-                  padding: '14px 24px',
-                  textAlign: 'center',
-                  fontSize: 16,
-                  color: '#23272f',
-                  cursor: 'pointer',
-                  borderRadius: 0,
-                  fontWeight: 500,
-                  transition: 'background 0.15s'
-                }}
+                style={navDropdownProfileBtnStyle}
                 onMouseOver={e => (e.currentTarget.style.background = '#f0f4f8')}
                 onMouseOut={e => (e.currentTarget.style.background = 'none')}
               >
-             Profile
+                Profile
               </button>
               <button
                 onClick={handleLogout}
-                style={{
-                  width: '100%',
-                  background: 'none',
-                  border: 'none',
-                  padding: '14px 24px',
-                  textAlign: 'center',
-                  fontSize: 16,
-                  color: '#23272f',
-                  cursor: 'pointer',
-                  borderRadius: 0,
-                  fontWeight: 500,
-                  transition: 'background 0.15s'
-                }}
+                style={navDropdownLogoutBtnStyle}
                 onMouseOver={e => (e.currentTarget.style.background = '#f0f4f8')}
                 onMouseOut={e => (e.currentTarget.style.background = 'none')}
               >
@@ -1683,31 +1119,9 @@ export default function Main({ token, onLogout }) {
             ☰
           </button>
           {burgerOpen && (
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: '80vw',
-                maxWidth: 320,
-                height: '100vh',
-                background: '#23272f',
-                color: '#fff',
-                zIndex: 2000,
-                boxShadow: '-2px 0 16px rgba(0,0,0,0.18)',
-                display: 'flex',
-                flexDirection: 'column',
-                padding: '32px 16px 16px 16px',
-                gap: 16
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 24
-              }}>
-                <span style={{ fontWeight: 900, fontSize: 22, color: '#61dafb' }}>
+            <div style={navBurgerMenuStyle}>
+              <div style={navBurgerHeaderStyle}>
+                <span style={navBurgerBrandStyle}>
                   {supplierName}
                 </span>
                 <button

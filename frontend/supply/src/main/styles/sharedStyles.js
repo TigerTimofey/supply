@@ -373,6 +373,34 @@ export const navDropdownItemStyle = {
   transition: 'background 0.15s'
 };
 
+export const navDropdownProfileBtnStyle = {
+  width: '100%',
+  background: 'none',
+  border: 'none',
+  padding: '14px 24px',
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#23272f',
+  cursor: 'pointer',
+  borderRadius: 0,
+  fontWeight: 500,
+  transition: 'background 0.15s'
+};
+
+export const navDropdownLogoutBtnStyle = {
+  width: '100%',
+  background: 'none',
+  border: 'none',
+  padding: '14px 24px',
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#23272f',
+  cursor: 'pointer',
+  borderRadius: 0,
+  fontWeight: 500,
+  transition: 'background 0.15s'
+};
+
 export const navBurgerStyle = {
   display: 'none',
   position: 'relative'
@@ -679,3 +707,68 @@ export const navBurgerMenuGap392 = { gap: 392 };
 export const navBurgerMenuGap396 = { gap: 396 };
 
 export const navBurgerMenuGap400 = { gap: 400 };
+
+export const saveBtnStyle = {
+  background: '#61dafb',
+  color: '#213254',
+  border: 'none',
+  borderRadius: 8,
+  padding: '7px 18px',
+  fontWeight: 700,
+  fontSize: 15,
+  cursor: 'pointer'
+};
+
+export const cancelBtnStyle = {
+  background: '#f0f4f8',
+  color: '#213254',
+  border: '1px solid #d1d5db',
+  borderRadius: 8,
+  padding: '7px 18px',
+  fontWeight: 500,
+  fontSize: 15,
+  cursor: 'pointer'
+};
+
+export const modalOverlayStyle = (isMobile = false) => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'rgba(33,50,84,0.22)',
+  zIndex: 4000,
+  display: 'flex',
+  justifyContent: 'center',
+  backdropFilter: 'blur(2px)',
+  overflowY: isMobile ? 'auto' : 'unset'
+});
+
+export const modalHeaderRowStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  justifyContent: 'center',
+  marginBottom: 24,
+  gap: 18
+};
+
+export const modalFormStyle = {
+  width: '100%',
+  marginBottom: 28,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 0,
+  minHeight: 420
+};
+
+export const editBtnStyle = {
+  background: 'none',
+  border: 'none',
+  color: '#3e68bd',
+  cursor: 'pointer',
+  fontWeight: 600,
+  fontSize: 15,
+  textDecoration: 'underline',
+  padding: 0
+};
