@@ -3,6 +3,7 @@ const router = express.Router();
 const userRepository = require('../repositories/UserRepository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User'); // <-- Add this import
 
 // JWT authentication middleware
 function authenticateToken(req, res, next) {
@@ -17,13 +18,13 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// Get all users (excluding passwords)
+// Get all users
 router.get('/', async (req, res) => {
     try {
-        const users = await User.find({}, { password: 0 });
+        const users = await User.find(); // Use the imported User model
         res.json(users);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(400).json({ error: err.message });
     }
 });
 
@@ -118,10 +119,10 @@ router.delete('/:id/catalogue/history', async (req, res) => {
 // Delete all users
 router.delete('/', async (req, res) => {
     try {
-        const result = await User.deleteMany({});
-        res.json({ deletedCount: result.deletedCount });
+        await User.deleteMany(); // Use the imported User model
+        res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(400).json({ error: err.message });
     }
 });
 

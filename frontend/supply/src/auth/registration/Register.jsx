@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
 
+const CATEGORY_OPTIONS = [
+  'alcohol',
+  'bakery',
+  'coffe and tea',
+  'fish and seafood',
+  'dairy',
+  'drinks',
+  'pallets',
+  'supplies',
+  'frozen meat',
+  'toys'
+];
+
 export default function Register({ switchToLogin }) {
   const [form, setForm] = useState({
     email: '',
     password: '',
     supplierName: '',
     origin: '',
-    productCategories: '',
+    productCategories: [],
     accountEmail: '',
     salesEmail: ''
   });
@@ -16,6 +29,15 @@ export default function Register({ switchToLogin }) {
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleCategoryClick = cat => {
+    setForm(f => {
+      const arr = f.productCategories.includes(cat)
+        ? f.productCategories.filter(c => c !== cat)
+        : [...f.productCategories, cat];
+      return { ...f, productCategories: arr };
+    });
   };
 
   const checkUserExists = async () => {
@@ -58,8 +80,8 @@ export default function Register({ switchToLogin }) {
       setMessage('Please fill in supplier name and origin');
       return;
     }
-    if (step === 3 && !form.productCategories) {
-      setMessage('Please fill in product categories');
+    if (step === 3 && (!form.productCategories || form.productCategories.length === 0)) {
+      setMessage('Please select at least one product category');
       return;
     }
     setStep(step + 1);
@@ -79,10 +101,7 @@ export default function Register({ switchToLogin }) {
       password: form.password,
       supplierName: form.supplierName,
       origin: form.origin,
-      productCategories: form.productCategories
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean),
+      productCategories: form.productCategories,
       accountEmail: form.accountEmail,
       salesEmail: form.salesEmail
     };
@@ -206,20 +225,42 @@ export default function Register({ switchToLogin }) {
         )}
         {step === 3 && (
           <>
-            <input
-              type="text"
-              name="productCategories"
-              placeholder="Product Categories (comma separated)"
-              value={form.productCategories}
-              onChange={handleChange}
-              required
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
-            />
+            <div style={{ marginBottom: 8, fontWeight: 700 /* bold */ }}>Select Product Categories:</div>
+            <div style={{
+              display: 'flex',
+              alignItems: "center",
+              flexWrap: 'wrap',
+              gap: 8,
+              marginBottom: 8,
+              justifyContent: 'center' // center the buttons
+            }}>
+              {CATEGORY_OPTIONS.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => handleCategoryClick(cat)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
+                    background: form.productCategories.includes(cat) ? '#61dafb' : '#fff',
+                    color: form.productCategories.includes(cat) ? '#213254' : '#222',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    fontSize: 15,
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+            {form.productCategories.length > 0 && (
+              <div style={{ fontSize: 13, color: '#888', textAlign: 'center' }}>
+                Selected: {form.productCategories.join(', ')}
+              </div>
+            )}
           </>
         )}
         {step === 4 && (
@@ -295,7 +336,18 @@ export default function Register({ switchToLogin }) {
       >
         Back to login
       </button>
-      {message && <div style={{ marginTop: 18, color: '#ffbaba', fontWeight: 500 }}>{message}</div>}
+      {message && (
+        <div
+          style={{
+            marginTop: 18,
+            color: message === 'Registration successful! You can now log in.' ? '#4BB543' : '#ffbaba',
+            fontWeight: 500,
+            textAlign: 'center'
+          }}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }
