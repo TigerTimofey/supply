@@ -8,6 +8,7 @@ const NAV_PAGES = [
   { label: 'Customers', key: 'customers' },
   { label: 'Payments', key: 'payments' },
   { label: 'Chat', key: 'chat' }
+  // Removed Supplier Data from nav menu
 ];
 
 const CSV_FIELDS = [
@@ -729,24 +730,1240 @@ function Catalogue({ token }) {
   );
 }
 
+function SupplierDataModal({ open, onClose, userId }) {
+  // Move hooks to top-level, never inside conditions
+  const [data, setData] = useState(null);
+  const [editField, setEditField] = useState(null);
+  const [form, setForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 600);
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (open && userId) {
+      fetch(`http://localhost:8080/users/${userId}`)
+        .then(res => res.json())
+        .then(d => {
+          setData(d);
+          setForm({
+            supplierName: d.supplierName || '',
+            email: d.email || '',
+            accountEmail: d.accountEmail || '',
+            salesEmail: d.salesEmail || '',
+            origin: d.origin || '',
+            productCategories: Array.isArray(d.productCategories) ? d.productCategories : []
+          });
+        });
+    }
+  }, [open, userId]);
+
+  const getMapSrc = (origin) => {
+    if (!origin) return '';
+    return `https://www.google.com/maps?q=${encodeURIComponent(origin)}&output=embed`;
+  };
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+  };
+
+  const handleCategoryToggle = cat => {
+    setForm(f => {
+      const arr = f.productCategories.includes(cat)
+        ? f.productCategories.filter(c => c !== cat)
+        : [...f.productCategories, cat];
+      return { ...f, productCategories: arr };
+    });
+  };
+
+  const handleSave = async (field) => {
+    setSaving(true);
+    setMessage('');
+    try {
+      const patch = field === 'productCategories'
+        ? { productCategories: form.productCategories }
+        : { [field]: form[field] };
+      const res = await fetch(`http://localhost:8080/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
+        body: JSON.stringify(patch)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setData(updated);
+        setEditField(null);
+        setMessage('Profile updated!');
+      } else {
+        const err = await res.json();
+        setMessage(err.error || 'Update failed');
+      }
+    } catch {
+      setMessage('Network error');
+    }
+    setSaving(false);
+  };
+
+  if (!open) return null;
+
+  const CATEGORY_OPTIONS = [
+    'alcohol',
+    'bakery',
+    'coffe and tea',
+    'fish and seafood',
+    'dairy',
+    'drinks',
+    'pallets',
+    'supplies',
+    'frozen meat',
+    'toys'
+  ];
+
+  const inputStyle = {
+    fontWeight: 500,
+    border: '1.5px solid #61dafb',
+    borderRadius: 8,
+    padding: '10px 16px',
+    fontSize: 17,
+    background: '#f7fafd',
+    outline: 'none',
+    transition: 'border 0.2s, box-shadow 0.2s',
+    boxShadow: '0 2px 8px rgba(97,218,251,0.10)',
+    width: isMobile ? '90vw' : '100%',
+    minWidth: 0,
+    maxWidth: isMobile ? '98vw' : undefined,
+    boxSizing: 'border-box',
+    display: 'block',
+    margin: isMobile ? '0 auto' : undefined
+  };
+
+  const fieldRowStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 18,
+    minHeight: 54,
+    background: 'rgba(97,218,251,0.07)',
+    borderRadius: 12,
+    padding: '10px 18px'
+  };
+
+  const labelStyle = {
+    fontWeight: 700,
+    color: '#3e68bd',
+    minWidth: 170,
+    flexShrink: 0,
+    fontSize: 16
+  };
+
+  const buttonGroupStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 8,
+    marginRight: 8
+  };
+
+  // Responsive modal style
+  const modalStyle = {
+    background: 'linear-gradient(120deg, #f7fafd 60%, #e3f0fa 100%)',
+    borderRadius: 22,
+    boxShadow: '0 12px 48px rgba(33,50,84,0.22)',
+    padding: '48px 36px 36px 36px',
+    maxWidth: 720,
+    width: '90vw',
+    minHeight: 700,
+    minWidth: 0,
+    margin: 16,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    position: 'relative',
+    transition: 'width 0.2s, min-height 0.2s',
+    boxSizing: 'border-box'
+  };
+
+  // For mobile: adjust modal style
+  const responsiveModalStyle = isMobile
+    ? {
+        ...modalStyle,
+        padding: '24px 4px 24px 4px',
+        maxWidth: '100vw',
+        width: '100vw',
+        minHeight: 0,
+        margin: 0,
+        borderRadius: 0,
+        top: 0,
+        left: 0,
+        position: 'fixed'
+      }
+    : modalStyle;
+
+  // For mobile: field row style
+  const mobileFieldRowStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 18,
+    minHeight: 54,
+    background: 'rgba(97,218,251,0.07)',
+    borderRadius: 12,
+    padding: '10px 10px',
+  };
+
+  // For mobile: label and edit button row (centered)
+  const mobileLabelEditRow = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    width: '100%',
+    marginBottom: 4,
+    textAlign: 'center'
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0, left: 0, width: '100vw', height: '100vh',
+      background: 'rgba(33,50,84,0.22)',
+      zIndex: 4000,
+      display: 'flex',
+      alignItems: isMobile ? 'flex-start' : 'center',
+      justifyContent: 'center',
+      backdropFilter: 'blur(2px)',
+      overflowY: isMobile ? 'auto' : 'unset'
+    }}>
+      <div style={responsiveModalStyle}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 18,
+            right: 18,
+            background: 'none',
+            border: 'none',
+            fontSize: 32,
+            color: '#213254',
+            cursor: 'pointer',
+            fontWeight: 700,
+            opacity: 0.7
+          }}
+          aria-label="Close"
+        >×</button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          justifyContent: 'center',
+          marginBottom: 24,
+          gap: 18
+        }}>
+          <h1 style={{
+            color: '#213254',
+            fontWeight: 900,
+            fontSize: 34,
+            letterSpacing: 1,
+            margin: 0
+          }}>
+            Profile
+          </h1>
+        </div>
+        {!data ? (
+          <div style={{ minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <span style={{ fontSize: 22, color: '#888' }}>Loading...</span>
+          </div>
+        ) : (
+          <form
+            style={{
+              width: '100%',
+              marginBottom: 28,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0,
+              minHeight: 420
+            }}
+          >
+            {/* Supplier Name */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Supplier Name:</span>
+                    {editField !== 'supplierName' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('supplierName')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'supplierName' ? (
+                      <>
+                        <input
+                          name="supplierName"
+                          value={form.supplierName}
+                          onChange={handleChange}
+                          style={inputStyle}
+                          required
+                          autoFocus
+                        />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('supplierName')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, supplierName: data.supplierName })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'block', textAlign: 'center' }}>{data.supplierName}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'supplierName' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('supplierName')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'supplierName' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('supplierName')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, supplierName: data.supplierName })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Supplier Name:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'supplierName' ? (
+                      <input
+                        name="supplierName"
+                        value={form.supplierName}
+                        onChange={handleChange}
+                        style={inputStyle}
+                        required
+                        autoFocus
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'inline' }}>{data.supplierName}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Email */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Email:</span>
+                    {editField !== 'email' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('email')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'email' ? (
+                      <>
+                        <input 
+                          name="email"
+                          type="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          style={inputStyle}
+                          required
+                        />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('email')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, email: data.email })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'block', textAlign: 'center' }}>{data.email}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'email' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('email')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'email' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('email')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, email: data.email })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Email:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'email' ? (
+                      <input
+                        name="email"
+                        type="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        style={inputStyle}
+                        required
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'inline' }}>{data.email}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Account Email */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Account Email:</span>
+                    {editField !== 'accountEmail' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('accountEmail')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'accountEmail' ? (
+                      <>
+                        <input
+                          name="accountEmail"
+                          type="email"
+                          value={form.accountEmail}
+                          onChange={handleChange}
+                          style={inputStyle}
+                        />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('accountEmail')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, accountEmail: data.accountEmail })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'block', textAlign: 'center' }}>{data.accountEmail}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'accountEmail' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('accountEmail')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'accountEmail' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('accountEmail')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, accountEmail: data.accountEmail })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Account Email:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'accountEmail' ? (
+                      <input
+                        name="accountEmail"
+                        type="email"
+                        value={form.accountEmail}
+                        onChange={handleChange}
+                        style={inputStyle}
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'inline' }}>{data.accountEmail}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Sales Email */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Sales Email:</span>
+                    {editField !== 'salesEmail' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('salesEmail')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'salesEmail' ? (
+                      <>
+                        <input
+                          name="salesEmail"
+                          type="email"
+                          value={form.salesEmail}
+                          onChange={handleChange}
+                          style={inputStyle}
+                        />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('salesEmail')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, salesEmail: data.salesEmail })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'block', textAlign: 'center' }}>{data.salesEmail}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'salesEmail' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('salesEmail')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'salesEmail' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('salesEmail')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, salesEmail: data.salesEmail })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Sales Email:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'salesEmail' ? (
+                      <input
+                        name="salesEmail"
+                        type="email"
+                        value={form.salesEmail}
+                        onChange={handleChange}
+                        style={inputStyle}
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'inline' }}>{data.salesEmail}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Origin */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Origin:</span>
+                    {editField !== 'origin' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('origin')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'origin' ? (
+                      <>
+                        <input
+                          name="origin"
+                          value={form.origin}
+                          onChange={handleChange}
+                          style={inputStyle}
+                        />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('origin')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, origin: data.origin })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'block', textAlign: 'center' }}>{data.origin}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'origin' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('origin')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'origin' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('origin')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, origin: data.origin })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Origin:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'origin' ? (
+                      <input
+                        name="origin"
+                        value={form.origin}
+                        onChange={handleChange}
+                        style={inputStyle}
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 500, display: 'inline' }}>{data.origin}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Product Categories */}
+            <div style={isMobile ? mobileFieldRowStyle : fieldRowStyle}>
+              {isMobile ? (
+                <>
+                  <div style={mobileLabelEditRow}>
+                    <span style={labelStyle}>Product Categories:</span>
+                    {editField !== 'productCategories' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('productCategories')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                  </div>
+                  <div style={{ width: '100%' }}>
+                    {editField === 'productCategories' ? (
+                      <span style={{ display: 'inline-block', width: '100%' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+                          {CATEGORY_OPTIONS.map(cat => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => handleCategoryToggle(cat)}
+                              style={{
+                                padding: '7px 18px',
+                                borderRadius: 20,
+                                border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
+                                background: form.productCategories.includes(cat) ? '#61dafb' : '#f7fafd',
+                                color: form.productCategories.includes(cat) ? '#213254' : '#222',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                outline: 'none',
+                                fontSize: 15,
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSave('productCategories')}
+                            disabled={saving}
+                            style={{
+                              background: '#61dafb',
+                              color: '#213254',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Save</button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditField(null); setForm(f => ({ ...f, productCategories: data.productCategories })); }}
+                            style={{
+                              background: '#f0f4f8',
+                              color: '#213254',
+                              border: '1px solid #d1d5db',
+                              borderRadius: 8,
+                              padding: '7px 18px',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              cursor: 'pointer'
+                            }}
+                          >Cancel</button>
+                        </div>
+                      </span>
+                    ) : (
+                      <span>
+                        {Array.isArray(data.productCategories) && data.productCategories.length > 0 ? (
+                          data.productCategories.map((cat) => (
+                            <span key={cat} style={{
+                              display: 'inline-block',
+                              background: '#e3f0fa',
+                              color: '#213254',
+                              borderRadius: 14,
+                              padding: '4px 14px',
+                              marginRight: 6,
+                              fontWeight: 600,
+                              fontSize: 15
+                            }}>{cat}</span>
+                          ))
+                        ) : (
+                          <span style={{ color: '#888' }}>None</span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={buttonGroupStyle}>
+                    {editField !== 'productCategories' && (
+                      <button
+                        type="button"
+                        onClick={() => setEditField('productCategories')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#3e68bd',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          textDecoration: 'underline',
+                          padding: 0
+                        }}
+                      >Edit</button>
+                    )}
+                    {editField === 'productCategories' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleSave('productCategories')}
+                          disabled={saving}
+                          style={{
+                            background: '#61dafb',
+                            color: '#213254',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 700,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Save</button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditField(null); setForm(f => ({ ...f, productCategories: data.productCategories })); }}
+                          style={{
+                            background: '#f0f4f8',
+                            color: '#213254',
+                            border: '1px solid #d1d5db',
+                            borderRadius: 8,
+                            padding: '7px 18px',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            cursor: 'pointer'
+                          }}
+                        >Cancel</button>
+                      </>
+                    )}
+                  </div>
+                  <span style={labelStyle}>Product Categories:</span>
+                  <div style={{ flex: 1, width: '100%' }}>
+                    {editField === 'productCategories' ? (
+                      <span style={{ display: 'inline-block' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {CATEGORY_OPTIONS.map(cat => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => handleCategoryToggle(cat)}
+                              style={{
+                                padding: '7px 18px',
+                                borderRadius: 20,
+                                border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
+                                background: form.productCategories.includes(cat) ? '#61dafb' : '#f7fafd',
+                                color: form.productCategories.includes(cat) ? '#213254' : '#222',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                outline: 'none',
+                                fontSize: 15,
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </span>
+                    ) : (
+                      <span>
+                        {Array.isArray(data.productCategories) && data.productCategories.length > 0 ? (
+                          data.productCategories.map((cat) => (
+                            <span key={cat} style={{
+                              display: 'inline-block',
+                              background: '#e3f0fa',
+                              color: '#213254',
+                              borderRadius: 14,
+                              padding: '4px 14px',
+                              marginRight: 6,
+                              fontWeight: 600,
+                              fontSize: 15
+                            }}>{cat}</span>
+                          ))
+                        ) : (
+                          <span style={{ color: '#888' }}>None</span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {message && (
+              <div style={{
+                marginTop: 10,
+                color: message === 'Profile updated!' ? '#4BB543' : '#ff4d4f',
+                fontWeight: 500,
+                textAlign: 'center'
+              }}>
+                {message}
+              </div>
+            )}
+            {(editField === 'origin' ? form.origin : data.origin) && (
+              <div style={{
+                width: '100%',
+                borderRadius: 14,
+                overflow: 'hidden',
+                boxShadow: '0 2px 16px rgba(33,50,84,0.10)',
+                marginTop: 18
+              }}>
+                <iframe
+                  title="Supplier Location"
+                  width="100%"
+                  height="220"
+                  frameBorder="0"
+                  style={{ border: 0 }}
+                  src={getMapSrc(editField === 'origin' ? form.origin : data.origin)}
+                  allowFullScreen=""
+                  aria-hidden="false"
+                  tabIndex="0"
+                />
+              </div>
+            )}
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Main({ token, onLogout }) {
   const [supplierName, setSupplierName] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [burgerOpen, setBurgerOpen] = useState(false);
   const [activePage, setActivePage] = useState('catalogue');
+  const [userId, setUserId] = useState('');
+  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
   const dropdownRef = useRef();
   const burgerRef = useRef();
 
   useEffect(() => {
     // Decode token to get userId
     const payload = token.split('.')[1];
-    let userId = '';
+    let userIdDecoded = '';
     try {
-      userId = JSON.parse(atob(payload)).userId;
+      userIdDecoded = JSON.parse(atob(payload)).userId;
     } catch {}
+    setUserId(userIdDecoded);
     // Fetch user info
-    if (userId) {
-      fetch(`http://localhost:8080/users/${userId}`)
+    if (userIdDecoded) {
+      fetch(`http://localhost:8080/users/${userIdDecoded}`)
         .then(res => res.json())
         .then(user => setSupplierName(user.supplierName));
     }
@@ -770,6 +1987,11 @@ export default function Main({ token, onLogout }) {
     localStorage.removeItem('token');
     if (onLogout) onLogout();
     window.location.href = '/';
+  };
+
+  // Add handler for supplier data
+  const handleSupplierData = () => {
+    window.open('/supplier-data.jsx', '_blank');
   };
 
   // Responsive: show burger menu on mobile
@@ -880,6 +2102,26 @@ export default function Main({ token, onLogout }) {
                 {supplierName}
               </div>
               <button
+                onClick={() => setSupplierModalOpen(true)}
+                style={{
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  padding: '14px 24px',
+                  textAlign: 'center',
+                  fontSize: 16,
+                  color: '#23272f',
+                  cursor: 'pointer',
+                  borderRadius: 0,
+                  fontWeight: 500,
+                  transition: 'background 0.15s'
+                }}
+                onMouseOver={e => (e.currentTarget.style.background = '#f0f4f8')}
+                onMouseOut={e => (e.currentTarget.style.background = 'none')}
+              >
+             Profile
+              </button>
+              <button
                 onClick={handleLogout}
                 style={{
                   width: '100%',
@@ -987,6 +2229,23 @@ export default function Main({ token, onLogout }) {
                 </button>
               ))}
               <button
+                onClick={() => setSupplierModalOpen(true)}
+                style={{
+                  background: '#f7fafd',
+                  color: '#213254',
+                  border: '1.5px solid #61dafb',
+                  borderRadius: 8,
+                  padding: '12px 0',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  cursor: 'pointer',
+                  marginTop: 8,
+                  marginBottom: 8
+                }}
+              >
+                Profile
+              </button>
+              <button
                 onClick={handleLogout}
                 style={{
                   background: '#61dafb',
@@ -997,7 +2256,7 @@ export default function Main({ token, onLogout }) {
                   fontWeight: 700,
                   fontSize: 16,
                   cursor: 'pointer',
-                  marginTop: 24
+                  marginTop: 8
                 }}
               >
                 Logout
@@ -1006,9 +2265,13 @@ export default function Main({ token, onLogout }) {
           )}
         </div>
       </nav>
+      <SupplierDataModal open={supplierModalOpen} onClose={() => setSupplierModalOpen(false)} userId={userId} />
       <div style={{ padding: 32 }}>
         {activePage === 'catalogue' ? (
           <Catalogue token={token} />
+        ) : activePage === 'supplier-data' ? (
+          // No longer used as a page, keep fallback for safety
+          <></>
         ) : (
           <h2>
             {NAV_PAGES.find(p => p.key === activePage)?.label || 'Welcome'}, {supplierName}!
