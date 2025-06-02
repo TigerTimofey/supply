@@ -6,6 +6,48 @@ import { csvExample } from './constants/csvExample';
 import { CATEGORY_OPTIONS } from './constants/categoryOptions';
 import CatalogueStats from './components/CatalogueStats';
 import CatalogueHistoryModal from './components/CatalogueHistoryModal';
+// Import shared styles
+import {
+  catalogueContainerStyle,
+  infoIconContainerStyle,
+  infoPopupStyle,
+  infoCopyBtnStyle,
+  infoPreStyle,
+  uploadLabelStyle,
+  fileNameSpanStyle,
+  removeFileBtnStyle,
+  dividerLineStyle,
+  searchInputStyle,
+  tableContainerStyle,
+  tableStyle,
+  thStyle,
+  tdStyle,
+  noDataTdStyle,
+  sortIconStyle,
+  closeBtnStyle,
+  loadingContainerStyle,
+  navStyle,
+  navBrandStyle,
+  navMenuStyle,
+  navBtnStyle,
+  navDropdownBtnStyle,
+  navDropdownMenuStyle,
+  navDropdownHeaderStyle,
+  navBurgerStyle,
+  navBurgerBtnStyle,
+  navBurgerCloseBtnStyle,
+  navBurgerPageBtnStyle,
+  navBurgerProfileBtnStyle,
+  navBurgerLogoutBtnStyle
+} from './sharedStyles';
+
+// Import utils
+import { saveCatalogue } from './utils/saveCatalogue';
+import { handleCopy } from './utils/handleCopy';
+import { handleFileChange } from './utils/handleFileChange';
+import { removeCatalogue } from './utils/removeCatalogue';
+import { revertCatalogue } from './utils/revertCatalogue';
+import { clearHistory } from './utils/clearHistory';
 
 function Catalogue({ token }) {
   const [rows, setRows] = useState([
@@ -86,103 +128,20 @@ function Catalogue({ token }) {
       .then(data => setHistory(Array.isArray(data) ? data : []));
   }, [userId, fileName]);
 
-  // Save catalogue to backend (save both content and filename)
-  const saveCatalogue = async (csvString, fileName) => {
-    if (!userId) return;
-    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csv: csvString, csvName: fileName })
-    });
-  };
+  // Utility wrappers to inject state/setters as needed
+  const handleCopyWrapper = () => handleCopy(csvExample, setCopied);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(csvExample);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
-  };
+  const handleFileChangeWrapper = (e) =>
+    handleFileChange(e, setFileName, setRows, saveCatalogue, userId);
 
-  // CSV upload handler
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setFileName(file.name);
-    const text = await file.text();
-    const lines = text.trim().split('\n');
-    if (!lines.length) return;
-    const headers = lines[0].split(';').map(h => h.trim());
-    const newRows = lines.slice(1).map(line => {
-      const cells = line.split(';').map(cell => cell.trim());
-      const row = {};
-      headers.forEach((h, i) => {
-        row[h] = cells[i] || '';
-      });
-      return row;
-    });
-    setRows(newRows);
-    // Save to backend
-    await saveCatalogue(text, file.name);
-  };
+  const removeCatalogueWrapper = () =>
+    removeCatalogue(userId, setFileName, setRows);
 
-  // Remove catalogue from backend and UI
-  const removeCatalogue = async () => {
-    if (!userId) return;
-    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
-      method: 'PUT'
-    });
-    setFileName('');
-    setRows([
-      {
-        code: '',
-        name: '',
-        description: '',
-        size: '',
-        order_unit: '',
-        price: '',
-        price_per_measure: '',
-        price_measure_unit: '',
-        optional_hide_from_market: ''
-      }
-    ]);
-  };
+  const revertCatalogueWrapper = async (historyEntry) =>
+    revertCatalogue(historyEntry, userId, setFileName, setRows, setHistory, setHistoryModalOpen);
 
-  // Revert to a previous catalogue version
-  const revertCatalogue = async (historyEntry) => {
-    if (!userId || !historyEntry.csv) return;
-    await fetch(`http://localhost:8080/users/${userId}/catalogue`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csv: historyEntry.csv, csvName: historyEntry.fileName })
-    });
-    setFileName(historyEntry.fileName);
-    const lines = historyEntry.csv.trim().split('\n');
-    if (lines.length) {
-      const headers = lines[0].split(';').map(h => h.trim());
-      const newRows = lines.slice(1).map(line => {
-        const cells = line.split(';').map(cell => cell.trim());
-        const row = {};
-        headers.forEach((h, i) => {
-          row[h] = cells[i] || '';
-        });
-        return row;
-      });
-      setRows(newRows);
-    }
-    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
-      .then(res => res.json())
-      .then(data => setHistory(Array.isArray(data) ? data : []));
-    setHistoryModalOpen(false);
-  };
-
-  // Clear all history
-  const clearHistory = async () => {
-    if (!userId) return;
-    await fetch(`http://localhost:8080/users/${userId}/catalogue/history`, {
-      method: 'DELETE'
-    });
-    setHistory([]);
-    setHistoryModalOpen(false);
-  };
+  const clearHistoryWrapper = () =>
+    clearHistory(userId, setHistory, setHistoryModalOpen);
 
   // Filtering logic
   let filteredRows = rows.filter(row =>
@@ -208,13 +167,13 @@ function Catalogue({ token }) {
   }
 
   return (
-    <div style={{ maxWidth: 1900, margin: '0 auto', background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', padding: 32, position: 'relative' }}>
+    <div style={catalogueContainerStyle}>
       {/* Info icon, file upload, and file name */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ color: '#213254', marginBottom: 0, marginRight: 12 }}>Catalogue</h2>
           <div
-            style={{ position: 'relative', display: 'inline-block' }}
+            style={infoIconContainerStyle}
             onMouseEnter={() => {
               clearTimeout(infoTimeout.current);
               setInfoOpen(true);
@@ -230,24 +189,7 @@ function Catalogue({ token }) {
             </svg>
             {infoOpen && (
               <div
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '120%',
-                  transform: 'translateX(-50%)',
-                  background: '#fff',
-                  color: '#23272f',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 8,
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
-                  padding: '14px 18px',
-                  fontSize: 14,
-                  minWidth: 340,
-                  maxWidth: 340,
-                  zIndex: 100,
-                  whiteSpace: 'pre-line',
-                  pointerEvents: 'auto'
-                }}
+                style={infoPopupStyle}
                 onMouseEnter={() => {
                   clearTimeout(infoTimeout.current);
                   setInfoOpen(true);
@@ -259,30 +201,13 @@ function Catalogue({ token }) {
                 <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <b>Example CSV:</b>
                   <button
-                    onClick={handleCopy}
-                    style={{
-                      marginLeft: 12,
-                      background: '#61dafb',
-                      color: '#213254',
-                      border: 'none',
-                      borderRadius: 5,
-                      padding: '4px 12px',
-                      fontWeight: 700,
-                      fontSize: 13,
-                      cursor: 'pointer'
-                    }}
+                    onClick={handleCopyWrapper}
+                    style={infoCopyBtnStyle}
                   >
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
-                <pre style={{
-                  background: '#f7fafd',
-                  borderRadius: 6,
-                  padding: 10,
-                  margin: 0,
-                  fontSize: 13,
-                  overflowX: 'auto'
-                }}>
+                <pre style={infoPreStyle}>
 {csvExample}
                 </pre>
               </div>
@@ -292,19 +217,7 @@ function Catalogue({ token }) {
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
           <label
             htmlFor="csv-upload"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              background: '#f7fafd',
-              color: '#213254',
-              border: '1px solid #61dafb',
-              borderRadius: 8,
-              padding: '10px 22px',
-              fontWeight: 600,
-              fontSize: 15,
-              cursor: 'pointer',
-              transition: 'background 0.15s, color 0.15s, border 0.15s'
-            }}
+            style={uploadLabelStyle}
           >
             <svg width="18" height="18" fill="#61dafb" style={{ marginRight: 8 }} viewBox="0 0 20 20">
               <path d="M16.5 10.5a.75.75 0 0 0-.75.75v3.25a1 1 0 0 1-1 1h-9.5a1 1 0 0 1-1-1v-3.25a.75.75 0 0 0-1.5 0v3.25A2.5 2.5 0 0 0 5.25 17h9.5A2.5 2.5 0 0 0 17.25 14.5v-3.25a.75.75 0 0 0-.75-.75z"/>
@@ -315,27 +228,17 @@ function Catalogue({ token }) {
               id="csv-upload"
               type="file"
               accept=".csv"
-              onChange={handleFileChange}
+              onChange={handleFileChangeWrapper}
               style={{ display: 'none' }}
             />
           </label>
-          <span style={{ fontSize: 14, color: '#666', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={fileNameSpanStyle}>
             {fileName ? (
               <>
                 {fileName}
                 <button
-                  onClick={removeCatalogue}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#ff4d4f',
-                    fontWeight: 700,
-                    fontSize: 18,
-                    cursor: 'pointer',
-                    marginLeft: 4,
-                    padding: 0,
-                    lineHeight: 1
-                  }}
+                  onClick={removeCatalogueWrapper}
+                  style={removeFileBtnStyle}
                   title="Remove file"
                 >
                   ×
@@ -354,7 +257,7 @@ function Catalogue({ token }) {
         onShowHistory={() => setHistoryModalOpen(true)}
       />
       {/* Divider line */}
-      <div style={{ width: '100%', height: 1, background: '#e0e0e0', margin: '24px 0' }} />
+      <div style={dividerLineStyle} />
       {/* Search input in its own div */}
       <div>
         <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -363,39 +266,28 @@ function Catalogue({ token }) {
             placeholder="Search by name"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{
-              padding: '8px 12px',
-              borderRadius: 6,
-              border: '1px solid #ccc',
-              fontSize: 15,
-              minWidth: 180
-            }}
+            style={searchInputStyle}
           />
         </div>
       </div>
       {/* Table in its own div */}
       <div>
-        <div style={{ overflowX: 'auto', marginTop: 24 }}>
-          <table style={{ borderCollapse: 'collapse', width: '100%', background: '#fff', color: '#23272f', fontSize: 15 }}>
+        <div style={tableContainerStyle}>
+          <table style={tableStyle}>
             <thead>
               <tr>
                 {CSV_FIELDS.map(field => (
-                  <th key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10, background: '#f7fafd', fontWeight: 700, position: 'relative' }}>
+                  <th key={field.key} style={thStyle}>
                     {field.label}
                     {field.key === 'code' && (
                       <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
                         <span
-                          style={{
-                            color: codeSort === 'asc' ? '#61dafb' : '#bbb',
-                            marginRight: 2
-                          }}
+                          style={sortIconStyle(codeSort === 'asc')}
                           onClick={() => setCodeSort(codeSort === 'asc' ? null : 'asc')}
                           title="Sort by code: A-Z"
                         >▲</span>
                         <span
-                          style={{
-                            color: codeSort === 'desc' ? '#61dafb' : '#bbb'
-                          }}
+                          style={sortIconStyle(codeSort === 'desc')}
                           onClick={() => setCodeSort(codeSort === 'desc' ? null : 'desc')}
                           title="Sort by code: Z-A"
                         >▼</span>
@@ -404,17 +296,12 @@ function Catalogue({ token }) {
                     {field.key === 'price' && (
                       <span style={{ marginLeft: 8, fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
                         <span
-                          style={{
-                            color: priceSort === 'asc' ? '#61dafb' : '#bbb',
-                            marginRight: 2
-                          }}
+                          style={sortIconStyle(priceSort === 'asc')}
                           onClick={() => setPriceSort(priceSort === 'asc' ? null : 'asc')}
                           title="Sort by price: low to high"
                         >▲</span>
                         <span
-                          style={{
-                            color: priceSort === 'desc' ? '#61dafb' : '#bbb'
-                          }}
+                          style={sortIconStyle(priceSort === 'desc')}
                           onClick={() => setPriceSort(priceSort === 'desc' ? null : 'desc')}
                           title="Sort by price: high to low"
                         >▼</span>
@@ -427,7 +314,7 @@ function Catalogue({ token }) {
             <tbody>
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={CSV_FIELDS.length} style={{ color: '#888', padding: 20, textAlign: 'center' }}>
+                  <td colSpan={CSV_FIELDS.length} style={noDataTdStyle}>
                     <em>No data</em>
                   </td>
                 </tr>
@@ -435,7 +322,7 @@ function Catalogue({ token }) {
                 filteredRows.map((row, i) => (
                   <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
                     {CSV_FIELDS.map(field => (
-                      <td key={field.key} style={{ border: '1px solid #e0e0e0', padding: 10 }}>
+                      <td key={field.key} style={tdStyle}>
                         {row[field.key]}
                       </td>
                     ))}
@@ -450,8 +337,8 @@ function Catalogue({ token }) {
         open={historyModalOpen}
         onClose={() => setHistoryModalOpen(false)}
         history={history}
-        onRevert={revertCatalogue}
-        onClearHistory={clearHistory}
+        onRevert={revertCatalogueWrapper}
+        onClearHistory={clearHistoryWrapper}
       />
     </div>
   );
@@ -532,12 +419,15 @@ function SupplierDataModal({ open, onClose, userId }) {
         setData(updated);
         setEditField(null);
         setMessage('Profile updated!');
+        setTimeout(() => setMessage(''), 1000);
       } else {
         const err = await res.json();
         setMessage(err.error || 'Update failed');
+        setTimeout(() => setMessage(''), 1000);
       }
     } catch {
       setMessage('Network error');
+      setTimeout(() => setMessage(''), 1000);
     }
     setSaving(false);
   };
@@ -662,18 +552,7 @@ function SupplierDataModal({ open, onClose, userId }) {
       <div style={responsiveModalStyle}>
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: 18,
-            right: 18,
-            background: 'none',
-            border: 'none',
-            fontSize: 32,
-            color: '#213254',
-            cursor: 'pointer',
-            fontWeight: 700,
-            opacity: 0.7
-          }}
+          style={closeBtnStyle}
           aria-label="Close"
         >×</button>
         <div style={{
@@ -695,7 +574,7 @@ function SupplierDataModal({ open, onClose, userId }) {
           </h1>
         </div>
         {!data ? (
-          <div style={{ minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <div style={loadingContainerStyle}>
             <span style={{ fontSize: 22, color: '#888' }}>Loading...</span>
           </div>
         ) : (
@@ -1707,50 +1586,21 @@ export default function Main({ token, onLogout }) {
   return (
     <div>
       <nav
-        style={{
-          background: '#23272f',
-          color: '#fff',
-          padding: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontWeight: 600,
-          fontSize: 18,
-          position: 'relative'
-        }}
+        style={navStyle}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           <span
-            style={{
-              fontWeight: 900,
-              fontSize: 22,
-              letterSpacing: '0.08em',
-              color: '#61dafb',
-              cursor: 'pointer'
-            }}
+            style={navBrandStyle}
             onClick={() => setActivePage('catalogue')}
           >
             NOT A EKKI
           </span>
-          <div className="main-nav-menu" style={{
-            display: 'flex',
-            gap: 24
-          }}>
+          <div className="main-nav-menu" style={navMenuStyle}>
             {NAV_PAGES.map(page => (
               <button
                 key={page.key}
                 onClick={() => setActivePage(page.key)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: activePage === page.key ? '#61dafb' : '#fff',
-                  fontWeight: activePage === page.key ? 700 : 500,
-                  fontSize: 17,
-                  cursor: 'pointer',
-                  padding: '6px 10px',
-                  borderBottom: activePage === page.key ? '2px solid #61dafb' : '2px solid transparent',
-                  transition: 'color 0.15s, border-bottom 0.15s'
-                }}
+                style={navBtnStyle(activePage === page.key)}
               >
                 {page.label}
               </button>
@@ -1766,47 +1616,17 @@ export default function Main({ token, onLogout }) {
           onMouseLeave={() => setDropdownOpen(false)}
         >
           <button
-            style={{
-              background: '#61dafb',
-              color: '#23272f',
-              border: 'none',
-              borderRadius: 8,
-              padding: '8px 18px',
-              fontWeight: 700,
-              fontSize: 16,
-              cursor: 'pointer',
-              display: 'none'
-            }}
+            style={navDropdownBtnStyle}
             className="main-nav-dropdown-btn"
           >
             {supplierName} ▾
           </button>
           {dropdownOpen && (
             <div
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: '100%',
-                background: '#fff',
-                color: '#23272f',
-                borderRadius: 12,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-                minWidth: 180,
-                padding: '8px 0',
-                transition: 'all 0.2s',
-                overflow: 'hidden',
-                textAlign: 'center',
-                zIndex: 1000
-              }}
+              style={navDropdownMenuStyle}
             >
               <div
-                style={{
-                  padding: '12px 24px',
-                  fontWeight: 600,
-                  fontSize: 17,
-                  borderBottom: '1px solid #eee',
-                  background: '#f7fafd'
-                }}
+                style={navDropdownHeaderStyle}
               >
                 {supplierName}
               </div>
@@ -1854,18 +1674,10 @@ export default function Main({ token, onLogout }) {
           )}
         </div>
         {/* Burger menu for mobile */}
-        <div className="main-nav-burger" ref={burgerRef} style={{ display: 'none', position: 'relative' }}>
+        <div className="main-nav-burger" ref={burgerRef} style={navBurgerStyle}>
           <button
             onClick={() => setBurgerOpen(b => !b)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#61dafb',
-              fontSize: 28,
-              cursor: 'pointer',
-              padding: 6,
-              marginLeft: 12
-            }}
+            style={navBurgerBtnStyle}
             aria-label="Menu"
           >
             ☰
@@ -1900,16 +1712,7 @@ export default function Main({ token, onLogout }) {
                 </span>
                 <button
                   onClick={() => setBurgerOpen(false)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#61dafb',
-                    fontSize: 32,
-                    cursor: 'pointer',
-                    marginLeft: 12,
-                    padding: 0,
-                    lineHeight: 1
-                  }}
+                  style={navBurgerCloseBtnStyle}
                   aria-label="Close menu"
                 >
                   ×
@@ -1922,51 +1725,20 @@ export default function Main({ token, onLogout }) {
                     setActivePage(page.key);
                     setBurgerOpen(false);
                   }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: activePage === page.key ? '#61dafb' : '#fff',
-                    fontWeight: activePage === page.key ? 700 : 500,
-                    fontSize: 18,
-                    cursor: 'pointer',
-                    padding: '10px 0',
-                    borderBottom: activePage === page.key ? '2px solid #61dafb' : '2px solid transparent',
-                    textAlign: 'left'
-                  }}
+                  style={navBurgerPageBtnStyle(activePage === page.key)}
                 >
                   {page.label}
                 </button>
               ))}
               <button
                 onClick={() => setSupplierModalOpen(true)}
-                style={{
-                  background: '#f7fafd',
-                  color: '#213254',
-                  border: '1.5px solid #61dafb',
-                  borderRadius: 8,
-                  padding: '12px 0',
-                  fontWeight: 700,
-                  fontSize: 16,
-                  cursor: 'pointer',
-                  marginTop: 8,
-                  marginBottom: 8
-                }}
+                style={navBurgerProfileBtnStyle}
               >
                 Profile
               </button>
               <button
                 onClick={handleLogout}
-                style={{
-                  background: '#61dafb',
-                  color: '#23272f',
-                  border: 'none',
-                  borderRadius: 8,
-                  padding: '12px 0',
-                  fontWeight: 700,
-                  fontSize: 16,
-                  cursor: 'pointer',
-                  marginTop: 8
-                }}
+                style={navBurgerLogoutBtnStyle}
               >
                 Logout
               </button>
