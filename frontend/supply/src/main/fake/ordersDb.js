@@ -7,7 +7,11 @@ function randomInt(min, max) {
 const FAKE_CUSTOMERS = [
   { name: 'Alice Bakery' },
   { name: 'Bob Cafe' },
-  { name: 'Charlie Restaurant' }
+  { name: 'Charlie Restaurant' },
+  { name: 'Daisy Deli' },
+  { name: 'Eve Eatery' },
+  { name: 'Frank Foodhall' },
+  { name: 'Grace Grocery' }
 ];
 
 const DAYS = [
@@ -22,6 +26,22 @@ function generateOrderNumber(customerIdx, dayIdx) {
   return `ORD-${(100 + customerIdx * 10 + dayIdx).toString().padStart(3, '0')}`;
 }
 
+function randomPaidStatus() {
+  // 40% paid, 40% unpaid, 20% pending (yellow)
+  const r = Math.random();
+  if (r < 0.4) return 'paid';
+  if (r < 0.8) return 'unpaid';
+  return 'pending';
+}
+
+function randomDaysToPay() {
+  // 50% 14 days, 25% 21 days, 25% 7 days
+  const r = Math.random();
+  if (r < 0.5) return 14;
+  if (r < 0.75) return 21;
+  return 7;
+}
+
 export function getOrdersFromCatalogueRows(rows) {
   if (!Array.isArray(rows) || rows.length === 0 || !rows[0].name) {
     return { orders: [], customers: [], days: DAYS };
@@ -30,26 +50,38 @@ export function getOrdersFromCatalogueRows(rows) {
   // For each customer, generate an order for each day with unique order number
   const orders = [];
   FAKE_CUSTOMERS.forEach((customer, customerIdx) => {
-    // Pick 1-3 random products from catalogue
-    const products = [];
-    const usedIndexes = new Set();
-    const numProducts = Math.min(randomInt(1, 3), rows.length);
-    while (products.length < numProducts) {
-      const i = randomInt(0, rows.length - 1);
-      if (!usedIndexes.has(i)) {
-        usedIndexes.add(i);
-        products.push({
-          name: rows[i].name,
-          code: rows[i].code
-        });
-      }
-    }
     DAYS.forEach((day, dayIdx) => {
+      // Pick 1-3 random products from catalogue for each order
+      const products = [];
+      const usedIndexes = new Set();
+      const numProducts = Math.min(randomInt(1, 3), rows.length);
+      while (products.length < numProducts) {
+        const i = randomInt(0, rows.length - 1);
+        if (!usedIndexes.has(i)) {
+          usedIndexes.add(i);
+          // Random quantity for each product
+          const quantity = randomInt(1, 5);
+          // Parse price from CSV (string to float)
+          const price = parseFloat(rows[i].price) || 0;
+          products.push({
+            name: rows[i].name,
+            code: rows[i].code,
+            price,
+            quantity,
+            lineTotal: price * quantity
+          });
+        }
+      }
+      const paidStatus = randomPaidStatus();
+      const daysToPay = randomDaysToPay();
       orders.push({
         orderNumber: generateOrderNumber(customerIdx + 1, dayIdx + 1),
         customerName: customer.name,
         products,
-        day
+        day,
+        invoiceTotal: products.reduce((sum, p) => sum + p.lineTotal, 0),
+        paidStatus, // 'paid', 'unpaid', or 'pending'
+        daysToPay
       });
     });
   });
