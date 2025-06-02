@@ -6,6 +6,8 @@ import { csvExample } from './constants/csvExample';
 import CatalogueStats from './components/catalogues-logic/CatalogueStats';
 import CatalogueHistoryModal from './components/catalogues-logic/CatalogueHistoryModal';
 import SupplierDataModal from './components/supplier-modal/SupplierDataModal';
+import Orders from './pages/Orders';
+import { getOrdersFromCatalogueRows } from './fake/ordersDb';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -67,20 +69,7 @@ import { removeCatalogue } from './utils/removeCatalogue';
 import { revertCatalogue } from './utils/revertCatalogue';
 import { clearHistory } from './utils/clearHistory';
 
-function Catalogue({ token }) {
-  const [rows, setRows] = useState([
-    {
-      code: '',
-      name: '',
-      description: '',
-      size: '',
-      order_unit: '',
-      price: '',
-      price_per_measure: '',
-      price_measure_unit: '',
-      optional_hide_from_market: ''
-    }
-  ]);
+function Catalogue({ token, setRows, rows }) {
   const [search, setSearch] = useState('');
   const [codeSearch] = useState('');
   const [priceSort, setPriceSort] = useState(null);
@@ -369,6 +358,19 @@ export default function Main({ token, onLogout }) {
   const [activePage, setActivePage] = useState('catalogue');
   const [userId, setUserId] = useState('');
   const [supplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [rows, setRows] = useState([
+    {
+      code: '',
+      name: '',
+      description: '',
+      size: '',
+      order_unit: '',
+      price: '',
+      price_per_measure: '',
+      price_measure_unit: '',
+      optional_hide_from_market: ''
+    }
+  ]);
   const dropdownRef = useRef();
   const burgerRef = useRef();
 
@@ -525,7 +527,9 @@ export default function Main({ token, onLogout }) {
       <SupplierDataModal open={supplierModalOpen} onClose={() => setSupplierModalOpen(false)} userId={userId} />
       <div style={{ padding: 32 }}>
         {activePage === 'catalogue' ? (
-          <Catalogue token={token} />
+          <Catalogue token={token} setRows={setRows} rows={rows} />
+        ) : activePage === 'orders' ? (
+          <Orders catalogueRows={rows} />
         ) : activePage === 'supplier-data' ? (
           // No longer used as a page, keep fallback for safety
           <></>
