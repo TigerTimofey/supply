@@ -667,7 +667,6 @@ function SupplierDataModal({ open, onClose, userId }) {
       background: 'rgba(33,50,84,0.22)',
       zIndex: 4000,
       display: 'flex',
-      alignItems: isMobile ? 'flex-start' : 'center',
       justifyContent: 'center',
       backdropFilter: 'blur(2px)',
       overflowY: isMobile ? 'auto' : 'unset'
