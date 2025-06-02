@@ -4,24 +4,6 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const FAKE_CUSTOMERS = [
-  // Active customers (with orders)
-  { name: 'Alice Bakery', daysToPay: 14 },
-  { name: 'Bob Cafe', daysToPay: 21 },
-  { name: 'Charlie Restaurant', daysToPay: 7 },
-  { name: 'Daisy Deli', daysToPay: 14 },
-  { name: 'Eve Eatery', daysToPay: 21 },
-  { name: 'Frank Foodhall', daysToPay: 7 },
-  // Pending customers (no orders)
-  { name: 'Pending Bistro', daysToPay: 14, status: 'pending' },
-  { name: 'Waiting Bar', daysToPay: 21, status: 'pending' },
-  { name: 'Future Foods', daysToPay: 7, status: 'pending' },
-  // Archived customers (no orders)
-  { name: 'Old Tavern', daysToPay: 14, status: 'archived' },
-  
-  { name: 'Closed Kitchen', daysToPay: 21, status: 'archived' }
-];
-
 const DAYS = [
   'Monday, 02 Jun',
   'Tuesday, 03 Jun',
@@ -42,17 +24,16 @@ function randomPaidStatus() {
   return 'pending';
 }
 
-
-export function getOrdersFromCatalogueRows(rows) {
+// Accept customers as argument, fallback to empty array
+export function getOrdersFromCatalogueRows(rows, customers = []) {
   if (!Array.isArray(rows) || rows.length === 0 || !rows[0].name) {
-    // Only return customers, no orders
-    return { orders: [], customers: FAKE_CUSTOMERS, days: DAYS };
+    return { orders: [], customers, days: DAYS };
   }
 
   // For each customer, generate an order for each day with unique order number
   const orders = [];
-  FAKE_CUSTOMERS.forEach((customer, customerIdx) => {
-    // Only generate orders for customers without status or with status 'active'
+  customers.forEach((customer, customerIdx) => {
+    // Only generate orders for customers with status 'active' or no status
     if (!customer.status || customer.status === 'active') {
       DAYS.forEach((day, dayIdx) => {
         // Pick 1-3 random products from catalogue for each order
@@ -83,15 +64,12 @@ export function getOrdersFromCatalogueRows(rows) {
           products,
           day,
           invoiceTotal: products.reduce((sum, p) => sum + p.lineTotal, 0),
-          paidStatus, // 'paid', 'unpaid', or 'pending'
+          paidStatus,
           daysToPay: customer.daysToPay
         });
       });
     }
   });
 
-  // All customers (active, pending, archived)
-  const usedCustomers = FAKE_CUSTOMERS;
-
-  return { orders, customers: usedCustomers, days: DAYS };
+  return { orders, customers, days: DAYS };
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
 import {
   catalogueContainerStyle,
@@ -124,9 +124,17 @@ export default function Orders({ catalogueRows }) {
   const [search, setSearch] = useState('');
   const [modalOrder, setModalOrder] = useState(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [customers, setCustomers] = useState([]);
 
-  // Get orders/customers/days from catalogueRows (uploaded CSV)
-  const { orders: ORDERS, customers: CUSTOMERS, days: DAYS } = getOrdersFromCatalogueRows(catalogueRows);
+  // Fetch customers from backend
+  useEffect(() => {
+    fetch('http://localhost:8080/customers')
+      .then(res => res.json())
+      .then(data => setCustomers(Array.isArray(data) ? data : []));
+  }, []);
+
+  // Get orders/customers/days from catalogueRows and fetched customers
+  const { orders: ORDERS, customers: CUSTOMERS, days: DAYS } = getOrdersFromCatalogueRows(catalogueRows, customers);
 
   // Get supplierName and supplierId from localStorage or context (fallback to empty)
   const supplierName = localStorage.getItem('supplierName') || '';
