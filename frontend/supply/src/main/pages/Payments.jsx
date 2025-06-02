@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle, searchInputStyle, dividerLineStyle } from '../styles/sharedStyles';
+import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
 
 // Fake data for demonstration
 const PAYMENTS = [
@@ -58,7 +59,6 @@ function PaymentsTable({ payments }) {
         <thead>
           <tr>
             <th style={thStyle}>Customer name</th>
-            <th style={thStyle}>Account number</th>
             <th style={thStyle}>Document type</th>
             <th style={thStyle}>Document number</th>
             <th style={thStyle}>Document received on</th>
@@ -73,13 +73,12 @@ function PaymentsTable({ payments }) {
         <tbody>
           {payments.map((p, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
-              <td style={tdStyle}>{p.customer}</td>
-              <td style={tdStyle}>{p.account}</td>
+              <td style={tdStyle}>{p.customerName}</td>
               <td style={tdStyle}>{p.docType}</td>
-              <td style={tdStyle}>{p.docNumber}</td>
+              <td style={tdStyle}>{p.orderNumber}</td>
               <td style={tdStyle}>{p.receivedOn}</td>
               <td style={tdStyle}>{p.docDate}</td>
-              <td style={tdStyle}>{p.total}</td>
+              <td style={tdStyle}>{p.invoiceTotal}</td>
               <td style={tdStyle}>{p.chargeStatus}</td>
               <td style={tdStyle}>{p.paymentMethod}</td>
               <td style={tdStyle}>{p.payoutStatus}</td>
@@ -127,12 +126,45 @@ function StatementsTable({ statements }) {
 export default function PaymentsPage() {
   const [tab, setTab] = useState('payments');
   const [search, setSearch] = useState('');
+  const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
-  // Filter payments by customer name, account number, or document number
-  const filteredPayments = PAYMENTS.filter(p =>
-    p.customer.toLowerCase().includes(search.toLowerCase()) ||
-    p.account.toLowerCase().includes(search.toLowerCase()) ||
-    p.docNumber.toLowerCase().includes(search.toLowerCase())
+  // Fetch customers and orders from backend
+  useEffect(() => {
+    fetch('http://localhost:8080/customers')
+      .then(res => res.json())
+      .then(data => setCustomers(Array.isArray(data) ? data : []));
+  }, []);
+
+  useEffect(() => {
+    // Fetch catalogueRows from localStorage or context if needed
+    // For demo, use a fake row to generate orders
+    const catalogueRows = [
+      { name: 'Product A', code: 'A1', price: 10 },
+      { name: 'Product B', code: 'B2', price: 20 }
+    ];
+    const { orders: ORDERS } = getOrdersFromCatalogueRows(catalogueRows, customers);
+    setOrders(ORDERS);
+  }, [customers]);
+
+  // Map orders to payments data
+  const paymentsData = orders.map(order => ({
+    customerName: order.customerName,
+    docType: 'Invoice',
+    orderNumber: order.orderNumber,
+    receivedOn: order.day,
+    docDate: order.day,
+    invoiceTotal: order.invoiceTotal,
+    chargeStatus: order.paidStatus === 'paid' ? 'Charged' : order.paidStatus === 'unpaid' ? 'Unpaid' : 'Pending',
+    paymentMethod: 'Bank Transfer',
+    payoutStatus: order.paidStatus === 'paid' ? 'Paid' : 'Pending',
+    expectedPayout: order.paidStatus === 'paid' ? order.day : ''
+  }));
+
+  // Filter payments by customer name, document number, etc.
+  const filteredPayments = paymentsData.filter(p =>
+    p.customerName.toLowerCase().includes(search.toLowerCase()) ||
+    p.orderNumber.toLowerCase().includes(search.toLowerCase())
   );
 
   // Filter statements by invoice number, time range, or issuedOn
@@ -142,15 +174,15 @@ export default function PaymentsPage() {
     s.issuedOn.toLowerCase().includes(search.toLowerCase())
   );
 
-  // CSV for payments
+  // Download as CSV for payments
   const handleDownloadPaymentsCSV = () => {
     const headers = [
-      'Customer name', 'Account number', 'Document type', 'Document number',
+      'Customer name', 'Document type', 'Document number',
       'Document received on', 'Document date', 'Total', 'Charge status',
       'Payment method', 'Payout status', 'Expected payout'
     ];
     const rows = filteredPayments.map(p =>
-      [p.customer, p.account, p.docType, p.docNumber, p.receivedOn, p.docDate, p.total, p.chargeStatus, p.paymentMethod, p.payoutStatus, p.expectedPayout]
+      [p.customerName, p.docType, p.orderNumber, p.receivedOn, p.docDate, p.invoiceTotal, p.chargeStatus, p.paymentMethod, p.payoutStatus, p.expectedPayout]
     );
     const csv = [headers, ...rows].map(r => r.join(';')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -183,31 +215,29 @@ export default function PaymentsPage() {
   return (
     <div style={catalogueContainerStyle}>
       <div style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 600, color: '#213254', paddingRight: 12, paddingBottom: 8, display: 'flex', justifyContent:'flex-end', textAlign:'center' }}>
-          connect accounting software to mark invoices as paid
+        <div style={{ fontWeight: 600, color: '#213254', paddingRight: 12, paddingBottom: 18, }}>
+          Connect accounting software to mark invoices as paid
         </div>
-        <div style={{ display: 'flex', justifyContent:'flex-end', gap: 8, marginBottom: 48 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
           <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>Xero</span></button>
           <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>SageOne</span></button>
           <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>Quickbook</span></button>
         </div>
-         <div style={dividerLineStyle} />
-      </div>
+      </div>          <div style={dividerLineStyle} />
       {tab === 'payments' && (
         <>
           <div style={{ display: 'flex', gap: 16, marginBottom: 18, alignItems: 'center' }}>
             <input
               type="text"
-              placeholder="Search by customer, account or document number"
+              placeholder="Search by customer or document number"
               value={search}
               onChange={e => setSearch(e.target.value)}
-    style={{...searchInputStyle, width: '100%', textAlign:'center'}}
+              style={{...searchInputStyle, width: '100%', textAlign:'center'}}
             />
             <button style={{ ...saveBtnStyle, fontSize: 15 }} onClick={handleDownloadPaymentsCSV}>
-              CSV
+             CSV
             </button>
-          </div>
-                <div style={dividerLineStyle} />
+          </div>          <div style={dividerLineStyle} />
           <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', gap: 16, marginBottom: 24 }}>
             <button
               style={{
@@ -248,7 +278,7 @@ export default function PaymentsPage() {
               CSV
             </button>
           </div>
-                <div style={dividerLineStyle} />
+          <div style={dividerLineStyle} />
           <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', gap: 16, marginBottom: 24 }}>
             <button
               style={{
