@@ -535,20 +535,6 @@ export default function Main({ token, onLogout }) {
           </h2>
         )}
       </div>
-      <style>
-        {`
-        @media (max-width: 900px) {
-          .main-nav-menu { display: none !important; }
-          .main-nav-dropdown-btn { display: none !important; }
-          .main-nav-burger { display: block !important; }
-        }
-        @media (min-width: 901px) {
-          .main-nav-menu { display: flex !important; }
-          .main-nav-dropdown-btn { display: inline-block !important; }
-          .main-nav-burger { display: none !important; }
-        }
-        `}
-      </style>
     </div>
   );
 }
