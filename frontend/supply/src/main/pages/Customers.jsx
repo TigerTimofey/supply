@@ -2,12 +2,6 @@ import React, { useState, useEffect } from 'react';
 import InviteCustomersModal from '../components/InviteCustomersModal';
 import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle } from '../styles/sharedStyles';
 
-// Helper to assign status for demo (in real app, status would come from backend)
-function getCustomerStatus(c) {
-  if (c.status === 'pending') return 'pending';
-  if (c.status === 'archived') return 'archived';
-  return 'active';
-}
 
 function CustomersTable({ customers, onArchive, onRestore, status }) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;

@@ -9,6 +9,7 @@ import SupplierDataModal from './components/supplier-modal/SupplierDataModal';
 import Orders from './pages/Orders';
 import CustomersPage from './pages/Customers';
 import PaymentsPage from './pages/Payments';
+import ChatPage from './pages/Chat';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -531,6 +532,8 @@ export default function Main({ token, onLogout }) {
           <CustomersPage />
         ) : activePage === 'payments' ? (
           <PaymentsPage />
+        ) : activePage === 'chat' ? (
+          <ChatPage />
         ) : activePage === 'supplier-data' ? (
           // No longer used as a page, keep fallback for safety
           <></>

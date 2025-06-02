@@ -1,55 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle, searchInputStyle, dividerLineStyle } from '../styles/sharedStyles';
 import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
+import { STATEMENTS } from '../fake/ordersDb';
 
-// Fake data for demonstration
-const PAYMENTS = [
-  {
-    customer: 'Alice Bakery',
-    account: 'GB12BARC12345612345678',
-    docType: 'Invoice',
-    docNumber: 'INV-001',
-    receivedOn: '2024-06-01',
-    docDate: '2024-05-31',
-    total: 120.50,
-    chargeStatus: 'Charged',
-    paymentMethod: 'Bank Transfer',
-    payoutStatus: 'Paid',
-    expectedPayout: '2024-06-05'
-  },
-  {
-    customer: 'Bob Cafe',
-    account: 'GB12BARC12345687654321',
-    docType: 'Credit Note',
-    docNumber: 'CN-002',
-    receivedOn: '2024-06-02',
-    docDate: '2024-06-01',
-    total: -30.00,
-    chargeStatus: 'Refunded',
-    paymentMethod: 'Card',
-    payoutStatus: 'Pending',
-    expectedPayout: '2024-06-07'
-  }
-];
 
-const STATEMENTS = [
-  {
-    issuedOn: '2024-06-01',
-    invoiceNumber: 'INV-001',
-    timeRange: 'May 2024',
-    vat: 20.10,
-    net: 100.40,
-    gross: 120.50
-  },
-  {
-    issuedOn: '2024-06-02',
-    invoiceNumber: 'INV-002',
-    timeRange: 'May 2024',
-    vat: 18.00,
-    net: 90.00,
-    gross: 108.00
-  }
-];
 
 function PaymentsTable({ payments }) {
   if (!payments.length) return <div style={{ color: '#888', padding: 24 }}>No payments found.</div>;

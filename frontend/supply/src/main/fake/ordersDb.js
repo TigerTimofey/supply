@@ -1,5 +1,22 @@
 // Generate fake orders from user-uploaded CSV product rows
-
+export const STATEMENTS = [
+  {
+    issuedOn: '2024-06-01',
+    invoiceNumber: 'INV-001',
+    timeRange: 'May 2024',
+    vat: 20.10,
+    net: 100.40,
+    gross: 120.50
+  },
+  {
+    issuedOn: '2024-06-02',
+    invoiceNumber: 'INV-002',
+    timeRange: 'May 2024',
+    vat: 18.00,
+    net: 90.00,
+    gross: 108.00
+  }
+];
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
