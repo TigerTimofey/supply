@@ -1,0 +1,91 @@
+# Supply Platform
+
+A full-stack web application for suppliers to manage their product catalogues, customers, and orders. The platform includes a React frontend and a Node.js/Express backend with MongoDB.
+
+---
+
+## Features
+
+- **Supplier Profile Management**: Edit and view supplier information, including emails, origin, and product categories.
+- **Product Catalogue**: Upload, edit, and manage product lists via CSV files.
+- **Customer Management**: Add, invite, and manage customers, including tracking their status.
+- **Order Management**: Generate and view orders based on catalogue and customer data.
+- **Authentication**: Secure login and registration with JWT-based authentication.
+- **Responsive UI**: Mobile-friendly and adaptive design.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v16+ recommended)
+- [MongoDB](https://www.mongodb.com/) (Atlas or local instance)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+
+---
+
+## Backend Setup
+
+1. **Install dependencies:**
+
+   ```bash
+   cd backend
+   npm install
+   ```
+
+2. **Configure environment variables:**
+
+   Create a `.env` file in the `backend` directory with the following content:
+
+   ```
+   JWT_SECRET=your_jwt_secret_here
+   MONGO_URI=your_mongodb_connection_string
+   PORT=8080
+   ```
+
+   - Replace `your_jwt_secret_here` with a secure random string.
+   - Replace `your_mongodb_connection_string` with your MongoDB URI.
+
+3. **Start the backend server:**
+
+   ```bash
+   npm start
+   ```
+
+   The backend will run on [http://localhost:8080](http://localhost:8080).
+
+---
+
+## Frontend Setup
+
+1. **Install dependencies:**
+
+   ```bash
+   cd frontend/supply
+   npm install
+   ```
+
+2. **Start the frontend development server:**
+
+   ```bash
+   npm start
+   ```
+
+   The frontend will run on [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Usage
+
+- **Login/Register**: Access the app at [http://localhost:3000](http://localhost:3000). Register a new supplier account or log in with existing credentials.
+- **Supplier Profile**: On login, you are redirected to your profile page. Edit your business details as needed.
+- **Catalogue**: Upload your product list as a CSV file. The system parses and displays your products.
+- **Customers**: Add and manage your customers. Track their status (active, pending, archived).
+- **Orders**: View generated orders based on your catalogue and customers.
+- **Payments & Chat**: Manage payments and communicate with customers (if enabled).
+
+---
+
+## Project Structure
+
