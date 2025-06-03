@@ -43,7 +43,7 @@ export default function Register({ switchToLogin }) {
   const checkUserExists = async () => {
     setChecking(true);
     try {
-      const res = await fetch(`https://supply-navy.vercel.app/users?email=${encodeURIComponent(form.email)}`);
+      const res = await fetch(`https://supply-sooty.vercel.app/users?email=${encodeURIComponent(form.email)}`);
       if (res.ok) {
         const users = await res.json();
         if (Array.isArray(users) && users.some(u => u.email === form.email)) {
@@ -106,7 +106,7 @@ export default function Register({ switchToLogin }) {
       salesEmail: form.salesEmail
     };
     try {
-      const res = await fetch('https://supply-navy.vercel.app/auth/register', {
+      const res = await fetch('https://supply-sooty.vercel.app/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

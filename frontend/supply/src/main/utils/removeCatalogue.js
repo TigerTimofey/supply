@@ -1,6 +1,6 @@
 export async function removeCatalogue(userId, setFileName, setRows) {
   if (!userId) return;
-  await fetch(`https://supply-navy.vercel.app/users/${userId}/catalogue`, {
+  await fetch(`https://supply-sooty.vercel.app/users/${userId}/catalogue`, {
     method: 'PUT'
   });
   setFileName('');

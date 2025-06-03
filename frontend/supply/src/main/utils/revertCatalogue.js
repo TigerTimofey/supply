@@ -1,6 +1,6 @@
 export async function revertCatalogue(historyEntry, userId, setFileName, setRows, setHistory, setHistoryModalOpen) {
   if (!userId || !historyEntry.csv) return;
-  await fetch(`https://supply-navy.vercel.app/users/${userId}/catalogue`, {
+  await fetch(`https://supply-sooty.vercel.app/users/${userId}/catalogue`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ csv: historyEntry.csv, csvName: historyEntry.fileName })
@@ -19,7 +19,7 @@ export async function revertCatalogue(historyEntry, userId, setFileName, setRows
     });
     setRows(newRows);
   }
-  fetch(`https://supply-navy.vercel.app/users/${userId}/catalogue/history`)
+  fetch(`https://supply-sooty.vercel.app/users/${userId}/catalogue/history`)
     .then(res => res.json())
     .then(data => setHistory(Array.isArray(data) ? data : []));
   setHistoryModalOpen(false);

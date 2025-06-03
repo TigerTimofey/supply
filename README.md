@@ -65,7 +65,7 @@ https://github.com/user-attachments/assets/c170a408-675a-4d8b-93e4-90441a998f53
    npm start
    ```
 
-   The backend will run on [https://supply-navy.vercel.app](https://supply-navy.vercel.app).
+   The backend will run on [https://supply-sooty.vercel.app](https://supply-sooty.vercel.app).
 
 ---
 

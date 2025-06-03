@@ -177,7 +177,7 @@ export default function CustomersPage() {
 
   // Fetch customers from backend
   useEffect(() => {
-    fetch('https://supply-navy.vercel.app/customers')
+    fetch('https://supply-sooty.vercel.app/customers')
       .then(res => res.json())
       .then(data => setCustomers(Array.isArray(data) ? data : []));
   }, []);
@@ -202,7 +202,7 @@ export default function CustomersPage() {
   const handleArchive = async (name) => {
     const customer = customers.find(c => c.name === name);
     if (!customer) return;
-    await fetch(`https://supply-navy.vercel.app/customers/${customer._id}`, {
+    await fetch(`https://supply-sooty.vercel.app/customers/${customer._id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'archived' })
@@ -218,7 +218,7 @@ export default function CustomersPage() {
   const handleRestore = async (name) => {
     const customer = customers.find(c => c.name === name);
     if (!customer) return;
-    await fetch(`https://supply-navy.vercel.app/customers/${customer._id}`, {
+    await fetch(`https://supply-sooty.vercel.app/customers/${customer._id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'active' })
