@@ -1776,3 +1776,102 @@ export const supplierRemindersCardStatusNotDoneStyle = {
   color: '#e74c3c',
   border: '2px solid #e74c3c'
 };
+
+export const ordersOnboardBannerStyle = (isMobile) => ({
+  background: '#f7fafd',
+  border: '1.5px solid #61dafb',
+  borderRadius: 10,
+  padding: '18px 24px',
+  marginBottom: 28,
+  display: 'flex',
+  alignItems: isMobile ? 'flex-start' : 'center',
+  justifyContent: 'space-between',
+  gap: 18,
+  flexDirection: isMobile ? 'column' : 'row'
+});
+
+export const ordersOnboardBannerTitleStyle = {
+  fontWeight: 700,
+  color: '#213254',
+  fontSize: 18,
+  marginBottom: 2
+};
+
+export const ordersOnboardBannerSubtitleStyle = {
+  color: '#3e68bd',
+  fontWeight: 600,
+  fontSize: 15
+};
+
+export const ordersOnboardBannerBtnStyle = (isMobile) => ({
+  minWidth: 160,
+  fontSize: 16,
+  padding: '10px 22px',
+  marginTop: isMobile ? 18 : 0
+});
+
+export const ordersMobileCustomerCardStyle = {
+  border: '1px solid #e0e0e0',
+  borderRadius: 10,
+  marginBottom: 18,
+  padding: 16,
+  background: '#f7fafd'
+};
+
+export const ordersMobileCustomerNameStyle = {
+  fontWeight: 700,
+  fontSize: 18,
+  marginBottom: 6
+};
+
+export const ordersMobileCustomerDaysStyle = {
+  fontSize: 12,
+  color: '#888',
+  marginBottom: 10
+};
+
+export const ordersMobileDayRowStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8
+};
+
+export const ordersMobileDayCellStyle = (bg) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  background: bg,
+  borderRadius: 6,
+  padding: '10px 14px',
+  marginBottom: 2,
+  boxShadow: '0 1px 4px rgba(33,50,84,0.04)',
+  cursor: 'pointer'
+});
+
+export const ordersMobileDayLabelStyle = {
+  color: '#3e68bd',
+  fontWeight: 600
+};
+
+export const ordersMobileDayOrderStyle = (color) => ({
+  fontWeight: 600,
+  color
+});
+
+export const ordersMobileDayEmptyStyle = {
+  height: 36,
+  background: '#f7fafd',
+  borderRadius: 6,
+  marginBottom: 2
+};
+
+export const ordersNoCustomersStyle = {
+  color: '#888',
+  padding: 24,
+  textAlign: 'center'
+};
+
+export const ordersNoCustomersSubtitleStyle = {
+  color: '#3e68bd',
+  fontWeight: 600
+};

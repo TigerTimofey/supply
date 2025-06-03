@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getOrdersFromCatalogueRows } from '../../fake/ordersDb';
 import {
   catalogueContainerStyle,
@@ -9,7 +9,21 @@ import {
   modalOverlayStyle,
   modalStyle,
   closeBtnStyle,
-  saveBtnStyle
+  saveBtnStyle,
+  ordersOnboardBannerStyle,
+  ordersOnboardBannerTitleStyle,
+  ordersOnboardBannerSubtitleStyle,
+  ordersOnboardBannerBtnStyle,
+  ordersMobileCustomerCardStyle,
+  ordersMobileCustomerNameStyle,
+  ordersMobileCustomerDaysStyle,
+  ordersMobileDayRowStyle,
+  ordersMobileDayCellStyle,
+  ordersMobileDayLabelStyle,
+  ordersMobileDayOrderStyle,
+  ordersMobileDayEmptyStyle,
+  ordersNoCustomersStyle,
+  ordersNoCustomersSubtitleStyle
 } from '../../styles/sharedStyles';
 import InviteCustomersModal from '../../components/InviteCustomersModal';
 
@@ -129,7 +143,6 @@ export default function Orders({ catalogueRows }) {
     typeof window !== 'undefined' ? window.innerWidth < 700 : false
   );
 
-  // Fetch customers from backend
   useEffect(() => {
     fetch('https://supply-sooty.vercel.app/customers')
       .then(res => res.json())
@@ -144,14 +157,11 @@ export default function Orders({ catalogueRows }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Get orders/customers/days from catalogueRows and fetched customers
   const { orders: ORDERS, customers: CUSTOMERS, days: DAYS } = getOrdersFromCatalogueRows(catalogueRows, customers);
 
-  // Get supplierName and supplierId from localStorage or context (fallback to empty)
   const supplierName = localStorage.getItem('supplierName') || '';
   const supplierId = localStorage.getItem('userId') || '';
 
-  // Build customerDaysToPay from ordersDb (first order for each customer)
   const customerDaysToPay = {};
   ORDERS.forEach(order => {
     if (order.customerName && order.daysToPay && customerDaysToPay[order.customerName] === undefined) {
@@ -198,12 +208,10 @@ export default function Orders({ catalogueRows }) {
     }
   });
 
-  // Ensure all customers are shown, even if no orders (for Grace Grocery)
   Object.keys(customerDaysToPay).forEach(customer => {
     if (!customerOrders[customer]) customerOrders[customer] = [];
   });
 
-  // Filter logic: search by order number, customer, or product details
   const filteredCustomers = Object.keys(customerOrders).filter(customer =>
     customer.toLowerCase().includes(search.toLowerCase()) ||
     customerOrders[customer].some(order =>
@@ -217,39 +225,22 @@ export default function Orders({ catalogueRows }) {
 
   return (
     <div style={catalogueContainerStyle}>
-      {/* Onboard banner */}
-      <div style={{
-        background: '#f7fafd',
-        border: '1.5px solid #61dafb',
-        borderRadius: 10,
-        padding: '18px 24px',
-        marginBottom: 28,
-        display: 'flex',
-        alignItems: isMobile ? 'flex-start' : 'center',
-        justifyContent: 'space-between',
-        gap: 18,
-        flexDirection: isMobile ? 'column' : 'row'
-      }}>
+
+      <div style={ordersOnboardBannerStyle(isMobile)}>
         <div>
-          <div style={{ fontWeight: 700, color: '#213254', fontSize: 18, marginBottom: 2 }}>
+          <div style={ordersOnboardBannerTitleStyle}>
             {isMobile
               ? 'Onboard your customers to see more orders on NOT A REKKI'
               : 'Onboard your customers to see more orders on REKKI'}
           </div>
           {!isMobile && (
-            <div style={{ color: '#3e68bd', fontWeight: 600, fontSize: 15 }}>
+            <div style={ordersOnboardBannerSubtitleStyle}>
               it is completely free and means that you can manage all your orders in one place
             </div>
           )}
         </div>
         <button
-          style={{
-            ...saveBtnStyle,
-            minWidth: 160,
-            fontSize: 16,
-            padding: '10px 22px',
-            marginTop: isMobile ? 18 : 0
-          }}
+          style={{ ...saveBtnStyle, ...ordersOnboardBannerBtnStyle(isMobile) }}
           onClick={() => setInviteModalOpen(true)}
         >
           Set up customer
@@ -311,7 +302,7 @@ export default function Orders({ catalogueRows }) {
                         const order = orders.find(o => o.day === day);
                         let bg, color;
                         if (!order) {
-                          // No order for this day
+
                           return (
                             <td key={day} style={{ ...tdStyle, background: '#f7fafd' }} />
                           );
@@ -359,9 +350,9 @@ export default function Orders({ catalogueRows }) {
         ) : (
           <div>
             {filteredCustomers.length === 0 ? (
-              <div style={{ color: '#888', padding: 24, textAlign: 'center' }}>
+              <div style={ordersNoCustomersStyle}>
                 Onboard your customers to see more orders on NOT A REKKI<br />
-                <span style={{ color: '#3e68bd', fontWeight: 600 }}>
+                <span style={ordersNoCustomersSubtitleStyle}>
                   it is completely free and means that you can manage all your orders in one place
                 </span>
               </div>
@@ -370,18 +361,12 @@ export default function Orders({ catalogueRows }) {
                 const orders = customerOrders[customer];
                 const daysToPay = customerDaysToPay[customer];
                 return (
-                  <div key={customer} style={{
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 10,
-                    marginBottom: 18,
-                    padding: 16,
-                    background: '#f7fafd'
-                  }}>
-                    <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{customer}</div>
-                    <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>
+                  <div key={customer} style={ordersMobileCustomerCardStyle}>
+                    <div style={ordersMobileCustomerNameStyle}>{customer}</div>
+                    <div style={ordersMobileCustomerDaysStyle}>
                       {daysToPay ? `${daysToPay} days to pay` : ''}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={ordersMobileDayRowStyle}>
                       {DAYS.map((day, idx) => {
                         const order = orders.find(o => o.day === day);
                         let bg, color;
@@ -389,12 +374,7 @@ export default function Orders({ catalogueRows }) {
                           return (
                             <div
                               key={day}
-                              style={{
-                                height: 36,
-                                background: '#f7fafd',
-                                borderRadius: 6,
-                                marginBottom: 2
-                              }}
+                              style={ordersMobileDayEmptyStyle}
                             />
                           );
                         }
@@ -414,25 +394,12 @@ export default function Orders({ catalogueRows }) {
                         return (
                           <div
                             key={day}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              background: bg,
-                              borderRadius: 6,
-                              padding: '10px 14px',
-                              marginBottom: 2,
-                              boxShadow: '0 1px 4px rgba(33,50,84,0.04)',
-                              cursor: 'pointer'
-                            }}
+                            style={ordersMobileDayCellStyle(bg)}
                             onClick={() => order && setModalOrder(order)}
                             title={`View order details (${daysToPay} days to pay)`}
                           >
-                            <span style={{ color: '#3e68bd', fontWeight: 600 }}>{day}</span>
-                            <span style={{
-                              fontWeight: 600,
-                              color
-                            }}>
+                            <span style={ordersMobileDayLabelStyle}>{day}</span>
+                            <span style={ordersMobileDayOrderStyle(color)}>
                               #{order?.orderNumber}
                             </span>
                           </div>
