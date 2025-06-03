@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { catalogueContainerStyle, saveBtnStyle } from '../../styles/sharedStyles';
+import  { useState } from 'react';
+import {
+  catalogueContainerStyle,
+  marketingIdeasContainerStyle,
+  marketingIdeaCardStyle,
+  marketingIdeaTitleStyle,
+  marketingIdeaDescStyle,
+  marketingIdeaBtnStyle
+} from '../../styles/sharedStyles';
 import PhoneModal from '../../components/PhoneModal';
 
-const IDEA_COLOR = "#61dafb";
 const ideas = [
   {
     title: "Grow your baskets",
@@ -44,37 +50,16 @@ export default function MarketingPage() {
   return (
     <div style={catalogueContainerStyle}>
       <h2 style={{ color: '#213254', marginBottom: 24 }}>Marketing Ideas</h2>
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 24,
-        marginBottom: 32
-      }}>
+      <div style={marketingIdeasContainerStyle}>
         {ideas.map((idea, idx) => (
           <div
             key={idx}
-            style={{
-              flex: '1 1 320px',
-              minWidth: 260,
-              maxWidth: 400,
-              background: '#f7fafd',
-              border: `2.5px solid ${IDEA_COLOR}`,
-              borderRadius: 16,
-              padding: '28px 24px',
-              boxShadow: '0 2px 12px rgba(33,50,84,0.06)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12
-            }}
+            style={marketingIdeaCardStyle}
           >
-            <div style={{ fontWeight: 800, fontSize: 20, color: IDEA_COLOR, marginBottom: 8 }}>
-              {idea.title}
-            </div>
-            <div style={{ color: '#213254', fontSize: 16, marginBottom: 8 }}>
-              {idea.description}
-            </div>
+            <div style={marketingIdeaTitleStyle}>{idea.title}</div>
+            <div style={marketingIdeaDescStyle}>{idea.description}</div>
             <button
-              style={{ ...saveBtnStyle, marginTop: 8, background: IDEA_COLOR, color: '#213254' }}
+              style={marketingIdeaBtnStyle}
               onClick={() => setModalIdea(idea)}
             >
               Learn more

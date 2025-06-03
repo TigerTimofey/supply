@@ -13,13 +13,13 @@ import {
 } from '../../styles/sharedStyles';
 import InviteCustomersModal from '../../components/InviteCustomersModal';
 
-// Order Modal
+
 function OrderModal({ open, order, onClose }) {
   if (!open || !order) return null;
 
-  // Calculate totals if not present (for backward compatibility)
+
   const products = order.products.map(p => {
-    // fallback if price/quantity/lineTotal missing
+
     const price = typeof p.price === 'number'
       ? p.price
       : parseFloat(p.price) || 0;

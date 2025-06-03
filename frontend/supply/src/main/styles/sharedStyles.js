@@ -1233,3 +1233,414 @@ export const inviteCustomersModalSectionTitleStyle = {
   width: '100%',
   textAlign: 'center'
 };
+
+export const chatPageContainerStyle = (isMobile) => ({
+  display: 'flex',
+  flexDirection: isMobile ? 'column' : 'row',
+  gap: isMobile ? 0 : 24,
+  minHeight: 400
+});
+
+export const chatPageListInputStyle = {
+  marginBottom: 42,
+  padding: '7px 10px',
+  borderRadius: 6,
+  border: '1px solid #ccc',
+  fontSize: 15
+};
+
+export const chatPageClientListStyle = (isMobile) => ({
+  minWidth: isMobile ? '100%' : 220,
+  borderRight: isMobile ? 'none' : '1px solid #e0e0e0',
+  borderBottom: isMobile ? '1px solid #e0e0e0' : 'none',
+  paddingRight: isMobile ? 0 : 8,
+  paddingBottom: isMobile ? 18 : 0,
+  maxHeight: isMobile ? 'unset' : 500,
+  overflowY: 'auto',
+  marginBottom: isMobile ? 18 : 0,
+  width: isMobile ? '100%' : undefined
+});
+
+export const chatPageClientItemStyle = (isMobile, selected) => ({
+  borderRadius: 8,
+  background: selected ? '#e6fbe6' : 'transparent',
+  color: selected ? '#1ca21c' : '#213254',
+  fontWeight: selected ? 700 : 500,
+  cursor: 'pointer',
+  marginBottom: isMobile ? 0 : 4,
+  marginRight: isMobile ? 8 : 0,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '8px',
+  minWidth: isMobile ? 120 : undefined,
+  border: isMobile && selected ? '1.5px solid #1ca21c' : 'none'
+});
+
+export const chatPageClientProBadgeStyle = {
+  marginLeft: 6,
+  background: '#61dafb',
+  color: '#213254',
+  fontWeight: 700,
+  fontSize: 12,
+  borderRadius: 6,
+  padding: '2px 10px',
+  letterSpacing: 1,
+  boxShadow: '0 1px 4px rgba(33,50,84,0.08)'
+};
+
+export const chatPageChatAreaStyle = (isMobile) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: 300,
+  marginTop: isMobile ? 18 : 0,
+  width: isMobile ? '100%' : undefined
+});
+
+export const chatPageChatHeaderStyle = {
+  fontWeight: 700,
+  fontSize: 18,
+  marginBottom: 8,
+  color: '#213254'
+};
+
+export const chatPageChatProBadgeStyle = {
+  marginLeft: 10,
+  background: '#e6fbe6',
+  color: '#1ca21c',
+  fontWeight: 700,
+  fontSize: 13,
+  borderRadius: 6,
+  padding: '2px 10px'
+};
+
+export const chatPageMessagesContainerStyle = (isMobile) => ({
+  flex: 1,
+  background: '#f7fafd',
+  borderRadius: 10,
+  padding: 16,
+  marginBottom: 12,
+  minHeight: 200,
+  maxHeight: isMobile ? 260 : 320,
+  overflowY: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8
+});
+
+export const chatPageMessageRowStyle = (fromMe) => ({
+  display: 'flex',
+  flexDirection: fromMe ? 'row-reverse' : 'row',
+  alignItems: 'flex-end',
+  marginBottom: 2
+});
+
+export const chatPageMessageBubbleStyle = (fromMe) => ({
+  alignSelf: fromMe ? 'flex-end' : 'flex-start',
+  background: fromMe ? '#61dafb' : '#fff',
+  color: '#213254',
+  borderRadius: 8,
+  padding: '8px 14px',
+  maxWidth: '70%',
+  fontSize: 15,
+  boxShadow: '0 1px 4px rgba(33,50,84,0.04)'
+});
+
+export const chatPageMessageDateStyle = (fromMe) => ({
+  fontSize: 11,
+  color: '#888',
+  margin: fromMe ? '0 10px 0 0' : '0 0 0 10px',
+  minWidth: 80,
+  textAlign: fromMe ? 'left' : 'right',
+  whiteSpace: 'nowrap'
+});
+
+export const chatPageInputRowStyle = {
+  display: 'flex',
+  gap: 8
+};
+
+export const chatPageInputStyle = {
+  flex: 1,
+  padding: '10px 14px',
+  borderRadius: 8,
+  border: '1px solid #ccc',
+  fontSize: 15
+};
+
+export const chatPageSendBtnStyle = {
+  ...saveBtnStyle,
+  minWidth: 80
+};
+
+export const chatPageNoClientStyle = {
+  color: '#888',
+  fontSize: 16,
+  marginTop: 40
+};
+
+export const customersMobileCardStyle = {
+  border: '1px solid #e0e0e0',
+  borderRadius: 10,
+  marginBottom: 18,
+  padding: 16,
+  background: '#f7fafd'
+};
+
+export const customersMobileNameStyle = {
+  fontWeight: 700,
+  fontSize: 18,
+  marginBottom: 6
+};
+
+export const customersMobileProStyle = {
+  color: '#1ca21c',
+  fontWeight: 700,
+  fontSize: 12,
+  marginBottom: 10
+};
+
+export const customersMobileDashStyle = {
+  color: '#888',
+  fontSize: 12,
+  marginBottom: 10
+};
+
+export const customersMobileStatStyle = {
+  fontSize: 14,
+  marginBottom: 4
+};
+
+export const customersMobileBtnArchiveStyle = {
+  ...saveBtnStyle,
+  background: '#f0f4f8',
+  color: '#e74c3c',
+  fontSize: 13,
+  padding: '6px 12px'
+};
+
+export const customersMobileBtnRestoreStyle = {
+  ...saveBtnStyle,
+  background: '#e6fbe6',
+  color: '#1ca21c',
+  fontSize: 13,
+  padding: '6px 12px'
+};
+
+export const customersOnboardBoxStyle = {
+  background: '#f7fafd',
+  border: '1.5px solid #61dafb',
+  borderRadius: 10,
+  padding: '18px 24px',
+  marginBottom: 28,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 10
+};
+
+export const customersOnboardTitleStyle = {
+  fontWeight: 700,
+  color: '#213254',
+  fontSize: 18,
+  marginBottom: 2
+};
+
+export const customersOnboardSubtitleStyle = {
+  color: '#3e68bd',
+  fontWeight: 600,
+  fontSize: 15
+};
+
+export const customersOnboardBtnGroupStyle = {
+  display: 'flex',
+  gap: 16,
+  marginTop: 14
+};
+
+export const customersTabBtnStyle = (active) => ({
+  ...saveBtnStyle,
+  background: active ? '#61dafb' : '#f0f4f8',
+  color: active ? '#213254' : '#888',
+  flex: 1,
+  minWidth: 120
+});
+
+export const customersTableRowStyle = (i) => ({
+  background: i % 2 === 0 ? '#fff' : '#f8fafd'
+});
+export const marketingIdeasContainerStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 24,
+  marginBottom: 32
+};
+
+export const marketingIdeaCardStyle = {
+  flex: '1 1 320px',
+  minWidth: 260,
+  maxWidth: 400,
+  background: '#f7fafd',
+  border: '2.5px solid #61dafb',
+  borderRadius: 16,
+  padding: '28px 24px',
+  boxShadow: '0 2px 12px rgba(33,50,84,0.06)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12
+};
+
+export const marketingIdeaTitleStyle = {
+  fontWeight: 800,
+  fontSize: 20,
+  color: '#61dafb',
+  marginBottom: 8
+};
+
+export const marketingIdeaDescStyle = {
+  color: '#213254',
+  fontSize: 16,
+  marginBottom: 8
+};
+
+export const marketingIdeaBtnStyle = {
+  ...saveBtnStyle,
+  marginTop: 8,
+  background: '#61dafb',
+  color: '#213254'
+};
+export const marketingPhoneModalOverlayStyle = {
+  position: 'fixed',
+  zIndex: 9999,
+  top: 0, left: 0, right: 0, bottom: 0,
+  background: 'rgba(33,50,84,0.18)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+};
+
+export const marketingPhoneModalStyle = {
+  width: 320,
+  height: 600,
+  background: '#f7fafd',
+  borderRadius: 36,
+  boxShadow: '0 8px 48px rgba(33,50,84,0.18)',
+  border: '3px solid #61dafb',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  position: 'relative',
+  overflow: 'hidden'
+};
+
+export const marketingPhoneModalNotchStyle = {
+  width: 80,
+  height: 12,
+  background: '#e0e0e0',
+  borderRadius: 8,
+  margin: '18px auto 0 auto'
+};
+
+export const marketingPhoneModalCloseBtnStyle = {
+  position: 'absolute',
+  top: 18,
+  right: 18,
+  background: 'none',
+  border: 'none',
+  fontSize: 28,
+  color: '#213254',
+  cursor: 'pointer',
+  fontWeight: 700,
+  opacity: 0.7
+};
+
+export const marketingPhoneModalContentStyle = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '36px 24px 24px 24px'
+};
+
+export const marketingPhoneModalHeaderStyle = {
+  fontWeight: 800,
+  fontSize: 22,
+  color: '#61dafb',
+  marginBottom: 18,
+  textAlign: 'center'
+};
+
+export const marketingPhoneModalOfferStyle = {
+  color: '#213254',
+  fontSize: 16,
+  marginBottom: 24,
+  textAlign: 'center'
+};
+
+export const marketingPhoneModalDemoBoxStyle = {
+  background: '#fff',
+  borderRadius: 18,
+  boxShadow: '0 2px 12px rgba(33,50,84,0.08)',
+  padding: 18,
+  marginTop: 10,
+  width: '100%',
+  maxWidth: 240,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+};
+
+export const marketingPhoneModalDemoTitleStyle = (color) => ({
+  fontWeight: 700,
+  fontSize: 16,
+  marginBottom: 8,
+  color
+});
+
+export const marketingPhoneModalDemoDescStyle = (color) => ({
+  color,
+  fontSize: 14,
+  marginBottom: 10,
+  textAlign: 'center'
+});
+
+export const marketingPhoneModalDemoBtnStyle = (bg, color) => ({
+  ...saveBtnStyle,
+  background: bg,
+  color,
+  fontWeight: 700,
+  fontSize: 15,
+  borderRadius: 8,
+  marginTop: 6
+});
+
+export const marketingPhoneModalDemoBadgeStyle = {
+  background: '#f7fafd',
+  border: '1.5px solid #61dafb',
+  borderRadius: 8,
+  padding: '8px 12px',
+  fontWeight: 600,
+  color: '#213254',
+  fontSize: 14
+};
+
+export const marketingPhoneModalDemoInfoStyle = {
+  marginTop: 18,
+  textAlign: 'center',
+  color: '#888',
+  fontSize: 14
+};
+
+export const loginTitleStyle = {
+  marginBottom: 24,
+  fontWeight: 700,
+  letterSpacing: 1
+};
+
+export const loginFormStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 16
+};

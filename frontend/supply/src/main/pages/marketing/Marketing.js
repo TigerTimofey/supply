@@ -1,7 +1,26 @@
-import React, { useState } from 'react';
-import { catalogueContainerStyle, saveBtnStyle } from '../../styles/sharedStyles';
+import { useState } from 'react';
+import {
+  catalogueContainerStyle,
+  marketingIdeasContainerStyle,
+  marketingIdeaCardStyle,
+  marketingIdeaTitleStyle,
+  marketingIdeaDescStyle,
+  marketingIdeaBtnStyle,
+  marketingPhoneModalOverlayStyle,
+  marketingPhoneModalStyle,
+  marketingPhoneModalNotchStyle,
+  marketingPhoneModalCloseBtnStyle,
+  marketingPhoneModalContentStyle,
+  marketingPhoneModalHeaderStyle,
+  marketingPhoneModalOfferStyle,
+  marketingPhoneModalDemoBoxStyle,
+  marketingPhoneModalDemoTitleStyle,
+  marketingPhoneModalDemoDescStyle,
+  marketingPhoneModalDemoBtnStyle,
+  marketingPhoneModalDemoBadgeStyle,
+  marketingPhoneModalDemoInfoStyle
+} from '../../styles/sharedStyles';
 
-const IDEA_COLOR = "#61dafb";
 const ideas = [
   {
     title: "Grow your baskets",
@@ -40,57 +59,21 @@ const ideas = [
 function PhoneModal({ open, onClose, idea }) {
   if (!open || !idea) return null;
 
-  // Demo UI for each idea
   function renderDemo() {
     if (idea.title === "Grow your baskets") {
       return (
-        <div style={{
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 2px 12px rgba(33,50,84,0.08)',
-          padding: 18,
-          marginTop: 10,
-          width: '100%',
-          maxWidth: 240,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: '#213254' }}>
+        <div style={marketingPhoneModalDemoBoxStyle}>
+          <div style={marketingPhoneModalDemoTitleStyle('#213254')}>
             Add more to your basket!
           </div>
-          <div style={{ color: '#3e68bd', fontSize: 14, marginBottom: 10, textAlign: 'center' }}>
+          <div style={marketingPhoneModalDemoDescStyle('#3e68bd')}>
             Customers who bought "Tomatoes" also bought:
           </div>
           <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-            <div style={{
-              background: '#f7fafd',
-              border: '1.5px solid #61dafb',
-              borderRadius: 8,
-              padding: '8px 12px',
-              fontWeight: 600,
-              color: '#213254',
-              fontSize: 14
-            }}>Cucumbers</div>
-            <div style={{
-              background: '#f7fafd',
-              border: '1.5px solid #61dafb',
-              borderRadius: 8,
-              padding: '8px 12px',
-              fontWeight: 600,
-              color: '#213254',
-              fontSize: 14
-            }}>Salad Mix</div>
+            <div style={marketingPhoneModalDemoBadgeStyle}>Cucumbers</div>
+            <div style={marketingPhoneModalDemoBadgeStyle}>Salad Mix</div>
           </div>
-          <button style={{
-            ...saveBtnStyle,
-            background: '#61dafb',
-            color: '#213254',
-            fontWeight: 700,
-            fontSize: 15,
-            borderRadius: 8,
-            marginTop: 6
-          }}>
+          <button style={marketingPhoneModalDemoBtnStyle('#61dafb', '#213254')}>
             Add to basket
           </button>
         </div>
@@ -98,33 +81,14 @@ function PhoneModal({ open, onClose, idea }) {
     }
     if (idea.title === "'Did you forget?' reminders") {
       return (
-        <div style={{
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 2px 12px rgba(33,50,84,0.08)',
-          padding: 18,
-          marginTop: 10,
-          width: '100%',
-          maxWidth: 240,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: '#e6b800' }}>
+        <div style={marketingPhoneModalDemoBoxStyle}>
+          <div style={marketingPhoneModalDemoTitleStyle('#e6b800')}>
             Did you forget?
           </div>
-          <div style={{ color: '#213254', fontSize: 14, marginBottom: 10, textAlign: 'center' }}>
+          <div style={marketingPhoneModalDemoDescStyle('#213254')}>
             You usually order <b>Milk</b> and <b>Bread</b>.<br />Add them to your order?
           </div>
-          <button style={{
-            ...saveBtnStyle,
-            background: '#e6b800',
-            color: '#213254',
-            fontWeight: 700,
-            fontSize: 15,
-            borderRadius: 8,
-            marginTop: 6
-          }}>
+          <button style={marketingPhoneModalDemoBtnStyle('#e6b800', '#213254')}>
             Add missing items
           </button>
         </div>
@@ -132,33 +96,14 @@ function PhoneModal({ open, onClose, idea }) {
     }
     if (idea.title === "Recommended products") {
       return (
-        <div style={{
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 2px 12px rgba(33,50,84,0.08)',
-          padding: 18,
-          marginTop: 10,
-          width: '100%',
-          maxWidth: 240,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: '#1ca21c' }}>
+        <div style={marketingPhoneModalDemoBoxStyle}>
+          <div style={marketingPhoneModalDemoTitleStyle('#1ca21c')}>
             Recommended for you
           </div>
-          <div style={{ color: '#213254', fontSize: 14, marginBottom: 10, textAlign: 'center' }}>
+          <div style={marketingPhoneModalDemoDescStyle('#213254')}>
             Try our new <b>Organic Eggs</b> and <b>Fresh Basil</b>!
           </div>
-          <button style={{
-            ...saveBtnStyle,
-            background: '#1ca21c',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: 15,
-            borderRadius: 8,
-            marginTop: 6
-          }}>
+          <button style={marketingPhoneModalDemoBtnStyle('#1ca21c', '#fff')}>
             Add to basket
           </button>
         </div>
@@ -166,33 +111,14 @@ function PhoneModal({ open, onClose, idea }) {
     }
     if (idea.title === "Broadcasts") {
       return (
-        <div style={{
-          background: '#fff',
-          borderRadius: 18,
-          boxShadow: '0 2px 12px rgba(33,50,84,0.08)',
-          padding: 18,
-          marginTop: 10,
-          width: '100%',
-          maxWidth: 240,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: '#3e68bd' }}>
+        <div style={marketingPhoneModalDemoBoxStyle}>
+          <div style={marketingPhoneModalDemoTitleStyle('#3e68bd')}>
             Special offer!
           </div>
-          <div style={{ color: '#213254', fontSize: 14, marginBottom: 10, textAlign: 'center' }}>
+          <div style={marketingPhoneModalDemoDescStyle('#213254')}>
             10% off all <b>Bakery</b> products this week only.
           </div>
-          <button style={{
-            ...saveBtnStyle,
-            background: '#3e68bd',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: 15,
-            borderRadius: 8,
-            marginTop: 6
-          }}>
+          <button style={marketingPhoneModalDemoBtnStyle('#3e68bd', '#fff')}>
             Shop now
           </button>
         </div>
@@ -202,70 +128,26 @@ function PhoneModal({ open, onClose, idea }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      zIndex: 9999,
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(33,50,84,0.18)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        width: 320,
-        height: 600,
-        background: '#f7fafd',
-        borderRadius: 36,
-        boxShadow: '0 8px 48px rgba(33,50,84,0.18)',
-        border: `3px solid ${IDEA_COLOR}`,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Phone notch */}
-        <div style={{
-          width: 80,
-          height: 12,
-          background: '#e0e0e0',
-          borderRadius: 8,
-          margin: '18px auto 0 auto'
-        }} />
-        {/* Close button */}
+    <div style={marketingPhoneModalOverlayStyle}>
+      <div style={marketingPhoneModalStyle}>
+        
+        <div style={marketingPhoneModalNotchStyle} />
+        
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: 18,
-            right: 18,
-            background: 'none',
-            border: 'none',
-            fontSize: 28,
-            color: '#213254',
-            cursor: 'pointer',
-            fontWeight: 700,
-            opacity: 0.7
-          }}
+          style={marketingPhoneModalCloseBtnStyle}
           aria-label="Close"
         >×</button>
-        {/* Modal content */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '36px 24px 24px 24px'
-        }}>
-          <div style={{ fontWeight: 800, fontSize: 22, color: IDEA_COLOR, marginBottom: 18, textAlign: 'center' }}>
+        
+        <div style={marketingPhoneModalContentStyle}>
+          <div style={marketingPhoneModalHeaderStyle}>
             {idea.modal.title}
           </div>
-          <div style={{ color: '#213254', fontSize: 16, marginBottom: 24, textAlign: 'center' }}>
+          <div style={marketingPhoneModalOfferStyle}>
             {idea.modal.offer}
           </div>
           {renderDemo()}
-          <div style={{ marginTop: 18, textAlign: 'center', color: '#888', fontSize: 14 }}>
+          <div style={marketingPhoneModalDemoInfoStyle}>
             This is how your marketing feature will look and work for your customers.
           </div>
         </div>
@@ -280,37 +162,16 @@ export default function MarketingPage() {
   return (
     <div style={catalogueContainerStyle}>
       <h2 style={{ color: '#213254', marginBottom: 24 }}>Marketing Ideas</h2>
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 24,
-        marginBottom: 32
-      }}>
+      <div style={marketingIdeasContainerStyle}>
         {ideas.map((idea, idx) => (
           <div
             key={idx}
-            style={{
-              flex: '1 1 320px',
-              minWidth: 260,
-              maxWidth: 400,
-              background: '#f7fafd',
-              border: `2.5px solid ${IDEA_COLOR}`,
-              borderRadius: 16,
-              padding: '28px 24px',
-              boxShadow: '0 2px 12px rgba(33,50,84,0.06)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12
-            }}
+            style={marketingIdeaCardStyle}
           >
-            <div style={{ fontWeight: 800, fontSize: 20, color: IDEA_COLOR, marginBottom: 8 }}>
-              {idea.title}
-            </div>
-            <div style={{ color: '#213254', fontSize: 16, marginBottom: 8 }}>
-              {idea.description}
-            </div>
+            <div style={marketingIdeaTitleStyle}>{idea.title}</div>
+            <div style={marketingIdeaDescStyle}>{idea.description}</div>
             <button
-              style={{ ...saveBtnStyle, marginTop: 8, background: IDEA_COLOR, color: '#213254' }}
+              style={marketingIdeaBtnStyle}
               onClick={() => setModalIdea(idea)}
             >
               Learn more

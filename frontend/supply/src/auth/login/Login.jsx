@@ -5,7 +5,10 @@ import {
   saveBtnStyle,
   messageStyle,
   buttonGroupStyle,
-  linkBtnStyle
+  linkBtnStyle,
+  registerContainerStyle,
+  loginTitleStyle,
+  loginFormStyle
 } from '../../main/styles/sharedStyles';
 
 export default function Login({ onLogin, switchToRegister }) {
@@ -58,19 +61,9 @@ export default function Login({ onLogin, switchToRegister }) {
   };
 
   return (
-    <div style={{
-      background: 'rgba(247, 247, 247, 0.09)',
-      padding: 32,
-      borderRadius: 16,
-      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
-      minWidth: 320,
-      maxWidth: 400,
-      width: '100%',
-      marginLeft: 16,
-      marginRight: 16
-    }}>
-      <h2 style={{ marginBottom: 24, fontWeight: 700, letterSpacing: 1 }}>Login</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={registerContainerStyle}>
+      <h2 style={loginTitleStyle}>Login</h2>
+      <form onSubmit={handleSubmit} style={loginFormStyle}>
         <input
           type="email"
           name="email"
