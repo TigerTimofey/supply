@@ -1081,7 +1081,6 @@ export const smsInviteModalContainerStyle = {
   boxShadow: '0 8px 32px rgba(33,50,84,0.18)',
   padding: 32,
   minWidth: 0,
-  width: 400,
   maxWidth: '95vw',
   minHeight: 0,
   display: 'flex',

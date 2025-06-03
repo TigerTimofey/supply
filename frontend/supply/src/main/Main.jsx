@@ -443,6 +443,7 @@ export default function Main({ token, onLogout }) {
               <button
                 key={page.key}
                 onClick={() => {
+        
                   setActivePage(page.key);
                   setShowSupplierPage(false);
                 }}
@@ -520,7 +521,9 @@ export default function Main({ token, onLogout }) {
                 <button
                   key={page.key}
                   onClick={() => {
+
                     setActivePage(page.key);
+                    setShowSupplierPage(false); 
                     setBurgerOpen(false);
                   }}
                   style={navBurgerPageBtnStyle(activePage === page.key)}
