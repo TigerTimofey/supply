@@ -432,7 +432,9 @@ export default function Main({ token, onLogout }) {
                   setActivePage(page.key);
                   setShowSupplierPage(false);
                 }}
-                style={navBtnStyle(activePage === page.key)}
+                style={navBtnStyle(
+                  !showSupplierPage && activePage === page.key
+                )}
               >
                 {page.label}
               </button>
