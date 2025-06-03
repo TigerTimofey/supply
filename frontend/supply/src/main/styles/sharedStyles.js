@@ -1644,3 +1644,135 @@ export const loginFormStyle = {
   flexDirection: 'column',
   gap: 16
 };
+
+export const paymentsTableContainerStyle = {
+  overflowX: 'auto'
+};
+
+export const paymentsTableStyle = {
+  width: '100%',
+  borderCollapse: 'collapse',
+  background: '#fff',
+  fontSize: 15
+};
+
+export const paymentsTableRowStyle = (i) => ({
+  background: i % 2 === 0 ? '#fff' : '#f8fafd'
+});
+
+export const paymentsTableNoDataStyle = {
+  color: '#888',
+  padding: 24
+};
+
+export const paymentsTabBtnStyle = (active) => ({
+  ...saveBtnStyle,
+  background: active ? '#61dafb' : '#f0f4f8',
+  color: active ? '#213254' : '#888',
+  minWidth: 120,
+  fontSize: 15
+});
+
+export const paymentsConnectBoxStyle = {
+  marginBottom: 18
+};
+
+export const paymentsConnectTitleStyle = {
+  fontWeight: 600,
+  color: '#213254',
+  paddingRight: 12,
+  paddingBottom: 18
+};
+
+export const paymentsConnectBtnGroupStyle = {
+  display: 'flex',
+  gap: 8,
+  marginBottom: 18
+};
+
+export const paymentsSearchInputStyle = {
+  display: 'flex',
+  gap: 16,
+  marginBottom: 18,
+  alignItems: 'center'
+};
+
+export const paymentsCSVBtnStyle = {
+  ...saveBtnStyle,
+  fontSize: 15
+};
+export const supplierRemindersCardColStyle = {
+  flex: 1,
+  minWidth: 260,
+  maxWidth: 340,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 18,
+  marginTop: 24
+};
+
+export const supplierRemindersCardStyle = (color) => ({
+  background: '#f7fafd',
+  border: `2px solid ${color}`,
+  borderRadius: 14,
+  padding: '22px 18px',
+  marginBottom: 0,
+  boxShadow: '0 2px 12px rgba(33,50,84,0.06)',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 14
+});
+
+export const supplierRemindersCardTitleStyle = (color) => ({
+  fontWeight: 700,
+  fontSize: 17,
+  color,
+  marginBottom: 6
+});
+
+export const supplierRemindersCardDescStyle = {
+  color: '#213254',
+  fontSize: 15
+};
+
+export const supplierRemindersCardBtnStyle = (color) => ({
+  marginTop: 12,
+  background: color,
+  color: '#213254',
+  fontWeight: 600,
+  border: 'none',
+  borderRadius: 8,
+  padding: '10px 0',
+  cursor: 'pointer',
+  fontSize: 15,
+  width: '100%'
+});
+
+export const supplierRemindersCardStatusDoneStyle = {
+  minWidth: 54,
+  minHeight: 54,
+  borderRadius: '50%',
+  background: '#d6f5e6',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 800,
+  fontSize: 22,
+  color: '#1ca21c',
+  border: '2px solid #1ca21c'
+};
+
+export const supplierRemindersCardStatusNotDoneStyle = {
+  minWidth: 54,
+  minHeight: 54,
+  borderRadius: '50%',
+  background: '#ffe6e6',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 800,
+  fontSize: 22,
+  color: '#e74c3c',
+  border: '2px solid #e74c3c'
+};

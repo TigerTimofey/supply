@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle, searchInputStyle, dividerLineStyle } from '../../styles/sharedStyles';
+import {
+  catalogueContainerStyle,
+  saveBtnStyle,
+  thStyle,
+  tdStyle,
+  searchInputStyle,
+  dividerLineStyle,
+  paymentsTableContainerStyle,
+  paymentsTableStyle,
+  paymentsTableRowStyle,
+  paymentsTableNoDataStyle,
+  paymentsTabBtnStyle,
+  paymentsConnectBoxStyle,
+  paymentsConnectTitleStyle,
+  paymentsConnectBtnGroupStyle,
+  paymentsSearchInputStyle,
+  paymentsCSVBtnStyle
+} from '../../styles/sharedStyles';
 import { getOrdersFromCatalogueRows } from '../../fake/ordersDb';
 import { STATEMENTS } from '../../fake/ordersDb';
 
 
 
 function PaymentsTable({ payments }) {
-  if (!payments.length) return <div style={{ color: '#888', padding: 24 }}>No payments found.</div>;
+  if (!payments.length) return <div style={paymentsTableNoDataStyle}>No payments found.</div>;
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', fontSize: 15 }}>
+    <div style={paymentsTableContainerStyle}>
+      <table style={paymentsTableStyle}>
         <thead>
           <tr>
             <th style={thStyle}>Customer name</th>
@@ -26,7 +43,7 @@ function PaymentsTable({ payments }) {
         </thead>
         <tbody>
           {payments.map((p, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
+            <tr key={i} style={paymentsTableRowStyle(i)}>
               <td style={tdStyle}>{p.customerName}</td>
               <td style={tdStyle}>{p.docType}</td>
               <td style={tdStyle}>{p.orderNumber}</td>
@@ -46,10 +63,10 @@ function PaymentsTable({ payments }) {
 }
 
 function StatementsTable({ statements }) {
-  if (!statements.length) return <div style={{ color: '#888', padding: 24 }}>No statements found.</div>;
+  if (!statements.length) return <div style={paymentsTableNoDataStyle}>No statements found.</div>;
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', fontSize: 15 }}>
+    <div style={paymentsTableContainerStyle}>
+      <table style={paymentsTableStyle}>
         <thead>
           <tr>
             <th style={thStyle}>Issued on</th>
@@ -62,7 +79,7 @@ function StatementsTable({ statements }) {
         </thead>
         <tbody>
           {statements.map((s, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafd' }}>
+            <tr key={i} style={paymentsTableRowStyle(i)}>
               <td style={tdStyle}>{s.issuedOn}</td>
               <td style={tdStyle}>{s.invoiceNumber}</td>
               <td style={tdStyle}>{s.timeRange}</td>
@@ -83,7 +100,7 @@ export default function PaymentsPage() {
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
 
-  // Fetch customers and orders from backend
+
   useEffect(() => {
     fetch('https://supply-sooty.vercel.app/customers')
       .then(res => res.json())
@@ -91,8 +108,6 @@ export default function PaymentsPage() {
   }, []);
 
   useEffect(() => {
-    // Fetch catalogueRows from localStorage or context if needed
-    // For demo, use a fake row to generate orders
     const catalogueRows = [
       { name: 'Product A', code: 'A1', price: 10 },
       { name: 'Product B', code: 'B2', price: 20 }
@@ -101,7 +116,7 @@ export default function PaymentsPage() {
     setOrders(ORDERS);
   }, [customers]);
 
-  // Map orders to payments data
+
   const paymentsData = orders.map(order => ({
     customerName: order.customerName,
     docType: 'Invoice',
@@ -115,20 +130,20 @@ export default function PaymentsPage() {
     expectedPayout: order.paidStatus === 'paid' ? order.day : ''
   }));
 
-  // Filter payments by customer name, document number, etc.
+
   const filteredPayments = paymentsData.filter(p =>
     p.customerName.toLowerCase().includes(search.toLowerCase()) ||
     p.orderNumber.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Filter statements by invoice number, time range, or issuedOn
+
   const filteredStatements = STATEMENTS.filter(s =>
     s.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
     s.timeRange.toLowerCase().includes(search.toLowerCase()) ||
     s.issuedOn.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Download as CSV for payments
+
   const handleDownloadPaymentsCSV = () => {
     const headers = [
       'Customer name', 'Document type', 'Document number',
@@ -148,7 +163,7 @@ export default function PaymentsPage() {
     URL.revokeObjectURL(url);
   };
 
-  // CSV for statements
+
   const handleDownloadStatementsCSV = () => {
     const headers = [
       'Issued on', 'Invoice number', 'Time range', 'VAT', 'Net', 'Gross'
@@ -168,47 +183,41 @@ export default function PaymentsPage() {
 
   return (
     <div style={catalogueContainerStyle}>
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 600, color: '#213254', paddingRight: 12, paddingBottom: 18, }}>
+      <div style={paymentsConnectBoxStyle}>
+        <div style={paymentsConnectTitleStyle}>
           Connect accounting software to mark invoices as paid
         </div>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-          <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>Xero</span></button>
-          <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>SageOne</span></button>
-          <button style={{ ...saveBtnStyle, marginRight: 4 }}><span>Quickbook</span></button>
+        <div style={paymentsConnectBtnGroupStyle}>
+          <button style={saveBtnStyle}><span>Xero</span></button>
+          <button style={saveBtnStyle}><span>SageOne</span></button>
+          <button style={saveBtnStyle}><span>Quickbook</span></button>
         </div>
-      </div>          <div style={dividerLineStyle} />
+      </div>
+      <div style={dividerLineStyle} />
       {tab === 'payments' && (
         <>
-          <div style={{ display: 'flex', gap: 16, marginBottom: 18, alignItems: 'center' }}>
+          <div style={paymentsSearchInputStyle}>
             <input
               type="text"
               placeholder="Search by customer or document number"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{...searchInputStyle, width: '100%', textAlign:'center'}}
+              style={searchInputStyle}
             />
-            <button style={{ ...saveBtnStyle, fontSize: 15 }} onClick={handleDownloadPaymentsCSV}>
-             CSV
+            <button style={paymentsCSVBtnStyle} onClick={handleDownloadPaymentsCSV}>
+              CSV
             </button>
-          </div>          <div style={dividerLineStyle} />
+          </div>
+          <div style={dividerLineStyle} />
           <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', gap: 16, marginBottom: 24 }}>
             <button
-              style={{
-                ...saveBtnStyle,
-                background: tab === 'payments' ? '#61dafb' : '#f0f4f8',
-                color: tab === 'payments' ? '#213254' : '#888'
-              }}
+              style={paymentsTabBtnStyle(tab === 'payments')}
               onClick={() => setTab('payments')}
             >
               Payments
             </button>
             <button
-              style={{
-                ...saveBtnStyle,
-                background: tab === 'statements' ? '#61dafb' : '#f0f4f8',
-                color: tab === 'statements' ? '#213254' : '#888'
-              }}
+              style={paymentsTabBtnStyle(tab === 'statements')}
               onClick={() => setTab('statements')}
             >
               Statements
@@ -220,36 +229,28 @@ export default function PaymentsPage() {
 
       {tab === 'statements' && (
         <>
-          <div style={{ display: 'flex', gap: 16, marginBottom: 18, alignItems: 'center',}}>
+          <div style={paymentsSearchInputStyle}>
             <input
               type="text"
               placeholder="Search by invoice number"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{...searchInputStyle, width: '100%', textAlign:'center'}}
+              style={searchInputStyle}
             />
-            <button style={{ ...saveBtnStyle, fontSize: 15 }} onClick={handleDownloadStatementsCSV}>
+            <button style={paymentsCSVBtnStyle} onClick={handleDownloadStatementsCSV}>
               CSV
             </button>
           </div>
           <div style={dividerLineStyle} />
           <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', gap: 16, marginBottom: 24 }}>
             <button
-              style={{
-                ...saveBtnStyle,
-                background: tab === 'payments' ? '#61dafb' : '#f0f4f8',
-                color: tab === 'payments' ? '#213254' : '#888'
-              }}
+              style={paymentsTabBtnStyle(tab === 'payments')}
               onClick={() => setTab('payments')}
             >
               Payments
             </button>
             <button
-              style={{
-                ...saveBtnStyle,
-                background: tab === 'statements' ? '#61dafb' : '#f0f4f8',
-                color: tab === 'statements' ? '#213254' : '#888'
-              }}
+              style={paymentsTabBtnStyle(tab === 'statements')}
               onClick={() => setTab('statements')}
             >
               Statements

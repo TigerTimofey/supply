@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   catalogueContainerStyle,
   fieldRowStyle,
@@ -6,7 +6,14 @@ import {
   inputStyle,
   saveBtnStyle,
   cancelBtnStyle,
-  mobileFieldRowStyle
+  mobileFieldRowStyle,
+  supplierRemindersCardColStyle,
+  supplierRemindersCardStyle,
+  supplierRemindersCardTitleStyle,
+  supplierRemindersCardDescStyle,
+  supplierRemindersCardBtnStyle,
+  supplierRemindersCardStatusDoneStyle,
+  supplierRemindersCardStatusNotDoneStyle,
 } from '../../styles/sharedStyles';
 import { CATEGORY_OPTIONS } from '../../constants/categoryOptions';
 
@@ -58,7 +65,6 @@ export default function SupplierPage({ onNav }) {
   }, []);
 
   useEffect(() => {
-    // Try to get userId from localStorage, fallback to decode token if missing
     let userId = localStorage.getItem('userId');
     if (!userId) {
       const token = localStorage.getItem('token');
@@ -101,7 +107,6 @@ export default function SupplierPage({ onNav }) {
       });
   }, []);
 
-  // Fetch customers and check for active status
   useEffect(() => {
     fetch('https://supply-sooty.vercel.app/customers')
       .then(res => res.json())
@@ -116,7 +121,6 @@ export default function SupplierPage({ onNav }) {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
 
-    // Live validation for email fields
     if (name === 'email') {
       setEmailError(value && !validateEmail(value) ? 'Invalid email address' : '');
     }
@@ -144,7 +148,6 @@ export default function SupplierPage({ onNav }) {
   };
 
   const validateEmail = (email) => {
-    // Simple email regex
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
@@ -152,7 +155,7 @@ export default function SupplierPage({ onNav }) {
     setSaving(true);
     setError('');
     setSuccess('');
-    // Email validation
+
     if (!validateEmail(form.email)) {
       setEmailError('Invalid email address');
       setSaving(false);
@@ -227,7 +230,6 @@ export default function SupplierPage({ onNav }) {
 
   const rowStyle = isMobile ? mobileFieldRowStyle : fieldRowStyle;
 
-  // Determine completion status for each reminder
   const isProfileFilled = !!(
     supplier &&
     supplier.supplierName &&
@@ -239,7 +241,7 @@ export default function SupplierPage({ onNav }) {
     supplier.productCategories.length > 0
   );
   const isPricelistAdded = !!(supplier && supplier.catalogueCsv && supplier.catalogueCsv.length > 0);
-  // Use customersActive instead of supplier.customers
+
   const isCustomersAdded = customersActive;
 
   const reminderStatus = {
@@ -448,16 +450,7 @@ export default function SupplierPage({ onNav }) {
             )}
           </div>
         </div>
-        {/* Reminders card column */}
-        <div style={{
-          flex: 1,
-          minWidth: 260,
-          maxWidth: 340,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 18,
-          marginTop: isMobile ? 24 : 0
-        }}>
+        <div style={supplierRemindersCardColStyle}>
           {REMINDER_CARDS.map((card, idx) => {
             const done = reminderStatus[card.key];
             let navTarget = null;
@@ -472,40 +465,18 @@ export default function SupplierPage({ onNav }) {
             return (
               <div
                 key={card.key}
-                style={{
-                  background: '#f7fafd',
-                  border: `2px solid ${card.color}`,
-                  borderRadius: 14,
-                  padding: '22px 18px',
-                  marginBottom: 0,
-                  boxShadow: '0 2px 12px rgba(33,50,84,0.06)',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 14
-                }}
+                style={supplierRemindersCardStyle(card.color)}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 17, color: card.color, marginBottom: 6 }}>
+                  <div style={supplierRemindersCardTitleStyle(card.color)}>
                     {card.title}
                   </div>
-                  <div style={{ color: '#213254', fontSize: 15 }}>
+                  <div style={supplierRemindersCardDescStyle}>
                     {card.description}
                   </div>
                   {!done && navTarget && (
                     <button
-                      style={{
-                        marginTop: 12,
-                        background: card.color,
-                        color: '#213254',
-                        fontWeight: 600,
-                        border: 'none',
-                        borderRadius: 8,
-                        padding: '10px 0',
-                        cursor: 'pointer',
-                        fontSize: 15,
-                        width: '100%'
-                      }}
+                      style={supplierRemindersCardBtnStyle(card.color)}
                       onClick={() => {
                         if (onNav) onNav(navTarget);
                       }}
@@ -514,25 +485,12 @@ export default function SupplierPage({ onNav }) {
                     </button>
                   )}
                 </div>
-                <div style={{
-                  minWidth: 54,
-                  minHeight: 54,
-                  borderRadius: '50%',
-                  background: done ? '#d6f5e6' : '#ffe6e6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: 22,
-                  color: done ? '#1ca21c' : '#e74c3c',
-                  border: `2px solid ${done ? '#1ca21c' : '#e74c3c'}`
-                }}>
+                <div style={done ? supplierRemindersCardStatusDoneStyle : supplierRemindersCardStatusNotDoneStyle}>
                   {done ? '✓' : '✗'}
                 </div>
               </div>
             );
           })}
-  
         </div>
       </div>
       {/* Map stays in its place */}

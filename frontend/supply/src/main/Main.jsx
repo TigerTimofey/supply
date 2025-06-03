@@ -11,7 +11,7 @@ import PaymentsPage from './pages/paymants/Payments';
 import ChatPage from './pages/chat/Chat';
 import MarketingPage from './pages/marketing/Marketing';
 import SupplierPage from './pages/supplier/SupplierPage';
-// Import shared styles
+
 import {
   catalogueContainerStyle,
   infoIconContainerStyle,
@@ -50,7 +50,7 @@ import {
 
 } from './styles/sharedStyles';
 
-// Import utils
+
 import { saveCatalogue } from './utils/saveCatalogue';
 import { handleCopy } from './utils/handleCopy';
 import { handleFileChange } from './utils/handleFileChange';
@@ -256,15 +256,15 @@ function Catalogue({ token, setRows, rows }) {
           </span>
         </div>
       </div>
-      {/* Sticker cards between file upload and catalogue data */}
+
       <CatalogueStats
         rows={rows}
         history={history}
         onShowHistory={() => setHistoryModalOpen(true)}
       />
-      {/* Divider line */}
+
       <div style={dividerLineStyle} />
-      {/* Search input in its own div */}
+
       <div>
         <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
           <input
@@ -276,7 +276,7 @@ function Catalogue({ token, setRows, rows }) {
           />
         </div>
       </div>
-      {/* Table in its own div */}
+
       <div>
         <div style={tableContainerStyle}>
           <table style={tableStyle}>
@@ -370,12 +370,12 @@ export default function Main({ token, onLogout }) {
       optional_hide_from_market: ''
     }
   ]);
-  const [showSupplierPage, setShowSupplierPage] = useState(true); // default to true
+  const [showSupplierPage, setShowSupplierPage] = useState(true);
   const dropdownRef = useRef();
   const burgerRef = useRef();
 
   useEffect(() => {
-    // Decode token to get userId
+
     const payload = token.split('.')[1];
     let userIdDecoded = '';
     try {
@@ -383,7 +383,6 @@ export default function Main({ token, onLogout }) {
     } catch {}
     setUserId(userIdDecoded);
 
-    // Only fetch supplierName if userIdDecoded is present
     if (userIdDecoded) {
       fetch(`https://supply-sooty.vercel.app/users/${userIdDecoded}`)
         .then(res => {
@@ -400,7 +399,7 @@ export default function Main({ token, onLogout }) {
     }
   }, [token]);
 
-  // Close dropdown on outside click
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -420,13 +419,13 @@ export default function Main({ token, onLogout }) {
     window.location.href = '/';
   };
 
-  // Handler for navigation from SupplierPage reminders
+
   const handleSupplierNav = (target) => {
     setShowSupplierPage(false);
     setActivePage(target);
   };
 
-  // Responsive: show burger menu on mobile
+
   return (
     <div>
       <nav
@@ -456,7 +455,7 @@ export default function Main({ token, onLogout }) {
             ))}
           </div>
         </div>
-        {/* Desktop dropdown */}
+
         <div
           className="main-nav-dropdown"
           style={{ position: 'relative', display: 'inline-block' }}
@@ -494,7 +493,7 @@ export default function Main({ token, onLogout }) {
             </div>
           )}
         </div>
-        {/* Burger menu for mobile */}
+
         <div className="main-nav-burger" ref={burgerRef} style={navBurgerStyle}>
           <button
             onClick={() => setBurgerOpen(b => !b)}
@@ -562,7 +561,7 @@ export default function Main({ token, onLogout }) {
         ) : activePage === 'marketing' ? (
           <MarketingPage />
         ) : activePage === 'supplier-data' ? (
-          // No longer used as a page, keep fallback for safety
+
           <></>
         ) : (
           <h2>
