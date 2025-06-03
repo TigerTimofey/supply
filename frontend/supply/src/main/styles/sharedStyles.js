@@ -1370,7 +1370,6 @@ export const chatPageInputStyle = {
 
 export const chatPageSendBtnStyle = {
   ...saveBtnStyle,
-  minWidth: 80
 };
 
 export const chatPageNoClientStyle = {
@@ -1478,7 +1477,6 @@ export const marketingIdeasContainerStyle = {
 
 export const marketingIdeaCardStyle = {
   flex: '1 1 320px',
-  minWidth: 260,
   maxWidth: 400,
   background: '#f7fafd',
   border: '2.5px solid #61dafb',

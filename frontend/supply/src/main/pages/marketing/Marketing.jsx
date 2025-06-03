@@ -46,9 +46,15 @@ const ideas = [
 
 export default function MarketingPage() {
   const [modalIdea, setModalIdea] = useState(null);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;
 
   return (
-    <div style={catalogueContainerStyle}>
+    <div style={{
+      ...catalogueContainerStyle,
+      maxWidth: isMobile ? '100vw' : catalogueContainerStyle.maxWidth,
+      padding: isMobile ? 8 : catalogueContainerStyle.padding,
+      boxSizing: 'border-box'
+    }}>
       <h2 style={{ color: '#213254', marginBottom: 24 }}>Marketing Ideas</h2>
       <div style={marketingIdeasContainerStyle}>
         {ideas.map((idea, idx) => (

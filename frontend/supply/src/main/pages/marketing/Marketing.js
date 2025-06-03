@@ -127,19 +127,31 @@ function PhoneModal({ open, onClose, idea }) {
     return null;
   }
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;
+
   return (
-    <div style={marketingPhoneModalOverlayStyle}>
-      <div style={marketingPhoneModalStyle}>
-        
+    <div style={{
+      ...marketingPhoneModalOverlayStyle,
+      alignItems: isMobile ? 'flex-start' : 'center'
+    }}>
+      <div style={{
+        ...marketingPhoneModalStyle,
+        width: isMobile ? '100vw' : 320,
+        height: isMobile ? '100vh' : 600,
+        borderRadius: isMobile ? 0 : 36,
+        maxWidth: '100vw',
+        maxHeight: '100vh'
+      }}>
         <div style={marketingPhoneModalNotchStyle} />
-        
         <button
           onClick={onClose}
           style={marketingPhoneModalCloseBtnStyle}
           aria-label="Close"
         >×</button>
-        
-        <div style={marketingPhoneModalContentStyle}>
+        <div style={{
+          ...marketingPhoneModalContentStyle,
+          padding: isMobile ? '24px 8px 16px 8px' : marketingPhoneModalContentStyle.padding
+        }}>
           <div style={marketingPhoneModalHeaderStyle}>
             {idea.modal.title}
           </div>
@@ -158,9 +170,15 @@ function PhoneModal({ open, onClose, idea }) {
 
 export default function MarketingPage() {
   const [modalIdea, setModalIdea] = useState(null);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 700;
 
   return (
-    <div style={catalogueContainerStyle}>
+    <div style={{
+      ...catalogueContainerStyle,
+      maxWidth: isMobile ? '100vw' : catalogueContainerStyle.maxWidth,
+      padding: isMobile ? 8 : catalogueContainerStyle.padding,
+      boxSizing: 'border-box'
+    }}>
       <h2 style={{ color: '#213254', marginBottom: 24 }}>Marketing Ideas</h2>
       <div style={marketingIdeasContainerStyle}>
         {ideas.map((idea, idx) => (

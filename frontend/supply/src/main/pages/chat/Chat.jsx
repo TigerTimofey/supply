@@ -28,6 +28,9 @@ export default function ChatPage() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.innerWidth < 700 : false
   );
+  const [isVerySmall, setIsVerySmall] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 400 : false
+  );
 
 
   useEffect(() => {
@@ -39,6 +42,7 @@ export default function ChatPage() {
   useEffect(() => {
     function handleResize() {
       setIsMobile(window.innerWidth < 700);
+      setIsVerySmall(window.innerWidth < 400);
     }
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -66,6 +70,16 @@ export default function ChatPage() {
     }));
     setInput('');
   };
+
+  // Custom input row style for very small screens
+  const inputRowStyle = isVerySmall
+    ? { display: 'flex', flexDirection: 'column', gap: 6 }
+    : chatPageInputRowStyle;
+
+  // Custom send button style for very small screens
+  const sendBtnStyle = isVerySmall
+    ? { ...chatPageSendBtnStyle, width: '100%' }
+    : chatPageSendBtnStyle;
 
   return (
     <div style={catalogueContainerStyle}>
@@ -129,7 +143,7 @@ export default function ChatPage() {
                   </div>
                 ))}
               </div>
-              <div style={chatPageInputRowStyle}>
+              <div style={inputRowStyle}>
                 <input
                   type="text"
                   value={input}
@@ -139,7 +153,7 @@ export default function ChatPage() {
                   onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
                 />
                 <button
-                  style={chatPageSendBtnStyle}
+                  style={sendBtnStyle}
                   onClick={handleSend}
                 >
                   Send
