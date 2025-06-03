@@ -110,6 +110,7 @@ export default function ChatPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  padding: '8px',
                   minWidth: isMobile ? 120 : undefined,
                   border: isMobile && selectedClient && selectedClient._id === client._id ? '1.5px solid #1ca21c' : 'none'
                 }}
