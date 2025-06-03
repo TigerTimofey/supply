@@ -959,3 +959,277 @@ export const catalogueStatsNoHistoryStyle = {
   fontSize: 16,
   marginBottom: 8
 };
+
+export const confirmModalOverlayStyle = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'rgba(0,0,0,0.25)',
+  zIndex: 3000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+};
+
+export const confirmModalBoxStyle = {
+  background: '#fff',
+  borderRadius: 12,
+  padding: 32,
+  minWidth: 320,
+  maxWidth: 400,
+  boxShadow: '0 4px 32px rgba(0,0,0,0.15)',
+  position: 'relative'
+};
+
+export const confirmModalTitleStyle = {
+  marginTop: 0,
+  color: '#213254',
+  fontSize: 20
+};
+
+export const confirmModalTextStyle = {
+  marginBottom: 24,
+  color: '#444',
+  fontSize: 15
+};
+
+export const confirmModalBtnGroupStyle = {
+  display: 'flex',
+  gap: 16,
+  justifyContent: 'flex-end'
+};
+
+export const confirmModalCancelBtnStyle = {
+  background: '#f0f4f8',
+  color: '#213254',
+  border: '1px solid #d1d5db',
+  borderRadius: 5,
+  padding: '6px 18px',
+  fontWeight: 500,
+  fontSize: 15,
+  cursor: 'pointer'
+};
+
+export const confirmModalConfirmBtnStyle = {
+  background: '#61dafb',
+  color: '#213254',
+  border: 'none',
+  borderRadius: 5,
+  padding: '6px 18px',
+  fontWeight: 700,
+  fontSize: 15,
+  cursor: 'pointer'
+};
+export const supplierModalCategoryBtnStyle = (selected) => ({
+  padding: '7px 18px',
+  borderRadius: 20,
+  border: selected ? '2px solid #61dafb' : '1px solid #ccc',
+  background: selected ? '#61dafb' : '#f7fafd',
+  color: selected ? '#213254' : '#222',
+  fontWeight: 600,
+  cursor: 'pointer',
+  outline: 'none',
+  fontSize: 15,
+  transition: 'all 0.15s'
+});
+
+export const supplierModalCategoryTagStyle = {
+  display: 'inline-block',
+  background: '#e3f0fa',
+  color: '#213254',
+  borderRadius: 14,
+  padding: '4px 14px',
+  marginRight: 6,
+  fontWeight: 600,
+  fontSize: 15
+};
+
+export const supplierModalCategoryListStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 8,
+  justifyContent: 'center'
+};
+
+export const supplierModalMessageStyle = (success) => ({
+  marginTop: 10,
+  color: success ? '#4BB543' : '#ff4d4f',
+  fontWeight: 500,
+  textAlign: 'center'
+});
+
+export const supplierModalMapContainerStyle = {
+  width: '100%',
+  borderRadius: 14,
+  overflow: 'hidden',
+  boxShadow: '0 2px 16px rgba(33,50,84,0.10)',
+  marginTop: 18
+};
+
+export const supplierModalEditBtnGroupStyle = {
+  display: 'flex',
+  gap: 8,
+  marginTop: 8,
+  justifyContent: 'center'
+};
+
+export const smsInviteModalContainerStyle = {
+  background: '#fff',
+  borderRadius: 16,
+  boxShadow: '0 8px 32px rgba(33,50,84,0.18)',
+  padding: 32,
+  minWidth: 0,
+  width: 400,
+  maxWidth: '95vw',
+  minHeight: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  position: 'relative'
+};
+
+export const smsInviteModalTitleStyle = {
+  color: '#213254',
+  marginBottom: 14,
+  fontWeight: 900,
+  fontSize: 20,
+  width: '100%',
+  textAlign: 'center'
+};
+
+export const smsInviteModalInputStyle = {
+  width: '100%',
+  padding: '10px 14px',
+  borderRadius: 8,
+  border: '1.5px solid #61dafb',
+  fontSize: 15,
+  marginBottom: 12
+};
+
+export const smsInviteModalTextareaStyle = {
+  width: '100%',
+  borderRadius: 8,
+  border: '1.5px solid #61dafb',
+  fontSize: 15,
+  padding: '10px 12px',
+  marginBottom: 12,
+  resize: 'vertical',
+  minHeight: 90
+};
+
+export const smsInviteModalInfoStyle = {
+  color: '#888',
+  fontSize: 13,
+  marginBottom: 10,
+  textAlign: 'center'
+};
+
+export const smsInviteModalSendBtnStyle = (disabled) => ({
+  ...saveBtnStyle,
+  width: '100%',
+  fontSize: 16,
+  opacity: disabled ? 0.5 : 1,
+  cursor: disabled ? 'not-allowed' : 'pointer'
+});
+
+export const inviteCustomersInfoBoxStyle = {
+  background: '#f7fafd',
+  border: '1.5px solid #61dafb',
+  borderRadius: 10,
+  padding: '16px 18px',
+  marginTop: 18,
+  fontSize: 15,
+  color: '#213254'
+};
+
+export const inviteCustomersBtnStyle = {
+  ...saveBtnStyle,
+  width: '100%',
+  fontSize: 16,
+  marginBottom: 40
+};
+
+export const inviteCustomersLinkInputStyle = {
+  flex: 1,
+  padding: '8px 10px',
+  borderRadius: 6,
+  border: '1px solid #ccc',
+  fontSize: 14,
+  background: '#fff'
+};
+
+export const inviteCustomersLinkBtnStyle = (copied) => ({
+  ...saveBtnStyle,
+  minWidth: 90,
+  fontSize: 15,
+  background: copied ? '#4BB543' : saveBtnStyle.background,
+  color: copied ? '#fff' : saveBtnStyle.color
+});
+
+export const inviteCustomersCustomerSeeStyle = {
+  marginTop: 14,
+  color: '#888',
+  fontSize: 15,
+  textAlign: 'center',
+  width: '100%',
+  marginBottom: 30
+};
+
+export const inviteCustomersWelcomeBoxStyle = {
+  fontSize: 17,
+  color: '#213254',
+  marginBottom: 22,
+  textAlign: 'center',
+  width: '100%',
+  background: 'linear-gradient(90deg, #f7fafd 60%, #e3f0fa 100%)',
+  borderRadius: 12,
+  padding: '18px 10px 18px 10px',
+  boxShadow: '0 2px 12px rgba(33,50,84,0.07)'
+};
+
+export const inviteCustomersWelcomeTitleStyle = {
+  fontWeight: 900,
+  fontSize: 22,
+  color: '#213254',
+  marginBottom: 8
+};
+
+export const inviteCustomersWelcomeSubtitleStyle = {
+  fontWeight: 600,
+  color: '#3e68bd',
+  fontSize: 16,
+  marginBottom: 8
+};
+
+export const inviteCustomersWelcomeSupplierStyle = {
+  fontWeight: 700,
+  fontSize: 18,
+  color: '#213254'
+};
+
+export const inviteCustomersConnectBtnStyle = {
+  ...saveBtnStyle,
+  marginTop: 12,
+  minWidth: 90,
+  fontSize: 15
+};
+
+export const inviteCustomersModalTitleStyle = {
+  color: '#213254',
+  marginBottom: 12,
+  fontWeight: 900,
+  fontSize: 26,
+  width: '100%',
+  textAlign: 'center'
+};
+
+export const inviteCustomersModalSectionTitleStyle = {
+  color: '#213254',
+  marginBottom: 12,
+  fontWeight: 900,
+  fontSize: 16,
+  width: '100%',
+  textAlign: 'center'
+};

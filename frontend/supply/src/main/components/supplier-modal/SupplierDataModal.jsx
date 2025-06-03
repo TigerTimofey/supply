@@ -17,7 +17,13 @@ import {
   modalHeaderRowStyle,
   profileHeaderStyle,
   modalFormStyle,
-  editBtnStyle
+  editBtnStyle,
+  supplierModalMapContainerStyle,
+  supplierModalCategoryBtnStyle,
+  supplierModalCategoryTagStyle,
+  supplierModalCategoryListStyle,
+  supplierModalMessageStyle,
+  supplierModalEditBtnGroupStyle
 } from '../../styles/sharedStyles';
 
 export default function SupplierDataModal({ open, onClose, userId }) {
@@ -515,30 +521,19 @@ export default function SupplierDataModal({ open, onClose, userId }) {
                   <div style={{ width: '100%' }}>
                     {editField === 'productCategories' ? (
                       <span style={{ display: 'inline-block', width: '100%' }}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+                        <div style={supplierModalCategoryListStyle}>
                           {CATEGORY_OPTIONS.map(cat => (
                             <button
                               key={cat}
                               type="button"
                               onClick={() => handleCategoryToggle(cat)}
-                              style={{
-                                padding: '7px 18px',
-                                borderRadius: 20,
-                                border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
-                                background: form.productCategories.includes(cat) ? '#61dafb' : '#f7fafd',
-                                color: form.productCategories.includes(cat) ? '#213254' : '#222',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                outline: 'none',
-                                fontSize: 15,
-                                transition: 'all 0.15s'
-                              }}
+                              style={supplierModalCategoryBtnStyle(form.productCategories.includes(cat))}
                             >
                               {cat}
                             </button>
                           ))}
                         </div>
-                        <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'center' }}>
+                        <div style={supplierModalEditBtnGroupStyle}>
                           <button
                             type="button"
                             onClick={() => handleSave('productCategories')}
@@ -556,16 +551,7 @@ export default function SupplierDataModal({ open, onClose, userId }) {
                       <span>
                         {Array.isArray(data.productCategories) && data.productCategories.length > 0 ? (
                           data.productCategories.map((cat) => (
-                            <span key={cat} style={{
-                              display: 'inline-block',
-                              background: '#e3f0fa',
-                              color: '#213254',
-                              borderRadius: 14,
-                              padding: '4px 14px',
-                              marginRight: 6,
-                              fontWeight: 600,
-                              fontSize: 15
-                            }}>{cat}</span>
+                            <span key={cat} style={supplierModalCategoryTagStyle}>{cat}</span>
                           ))
                         ) : (
                           <span style={{ color: '#888' }}>None</span>
@@ -581,24 +567,13 @@ export default function SupplierDataModal({ open, onClose, userId }) {
                   <div style={{ flex: 1, width: '100%' }}>
                     {editField === 'productCategories' ? (
                       <span style={{ display: 'inline-block' }}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        <div style={supplierModalCategoryListStyle}>
                           {CATEGORY_OPTIONS.map(cat => (
                             <button
                               key={cat}
                               type="button"
                               onClick={() => handleCategoryToggle(cat)}
-                              style={{
-                                padding: '7px 18px',
-                                borderRadius: 20,
-                                border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
-                                background: form.productCategories.includes(cat) ? '#61dafb' : '#f7fafd',
-                                color: form.productCategories.includes(cat) ? '#213254' : '#222',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                outline: 'none',
-                                fontSize: 15,
-                                transition: 'all 0.15s'
-                              }}
+                              style={supplierModalCategoryBtnStyle(form.productCategories.includes(cat))}
                             >
                               {cat}
                             </button>
@@ -609,16 +584,7 @@ export default function SupplierDataModal({ open, onClose, userId }) {
                       <span>
                         {Array.isArray(data.productCategories) && data.productCategories.length > 0 ? (
                           data.productCategories.map((cat) => (
-                            <span key={cat} style={{
-                              display: 'inline-block',
-                              background: '#e3f0fa',
-                              color: '#213254',
-                              borderRadius: 14,
-                              padding: '4px 14px',
-                              marginRight: 6,
-                              fontWeight: 600,
-                              fontSize: 15
-                            }}>{cat}</span>
+                            <span key={cat} style={supplierModalCategoryTagStyle}>{cat}</span>
                           ))
                         ) : (
                           <span style={{ color: '#888' }}>None</span>
@@ -630,23 +596,12 @@ export default function SupplierDataModal({ open, onClose, userId }) {
               )}
             </div>
             {message && (
-              <div style={{
-                marginTop: 10,
-                color: message === 'Profile updated!' ? '#4BB543' : '#ff4d4f',
-                fontWeight: 500,
-                textAlign: 'center'
-              }}>
+              <div style={supplierModalMessageStyle(message === 'Profile updated!')}>
                 {message}
               </div>
             )}
             {(editField === 'origin' ? form.origin : data.origin) && (
-              <div style={{
-                width: '100%',
-                borderRadius: 14,
-                overflow: 'hidden',
-                boxShadow: '0 2px 16px rgba(33,50,84,0.10)',
-                marginTop: 18
-              }}>
+              <div style={supplierModalMapContainerStyle}>
                 <iframe
                   title="Supplier Location"
                   width="100%"

@@ -26,7 +26,6 @@ export default function ChatPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Filter and sort clients: PRO first, then by name, and search by name
   const filteredClients = clients
     .filter(client =>
       client.name.toLowerCase().includes(search.toLowerCase())
@@ -38,7 +37,6 @@ export default function ChatPage() {
       return a.name.localeCompare(b.name);
     });
 
-  // Handle sending a message (local only, not persisted)
   const handleSend = () => {
     if (!input.trim() || !selectedClient) return;
     setMessages(prev => ({
