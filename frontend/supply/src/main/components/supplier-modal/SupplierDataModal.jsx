@@ -74,9 +74,22 @@ export default function SupplierDataModal({ open, onClose, userId }) {
     });
   };
 
+  // Email validation helper
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSave = async (field) => {
     setSaving(true);
     setMessage('');
+    // Email validation for email fields
+    if (
+      (field === 'email' && !validateEmail(form.email)) ||
+      (field === 'accountEmail' && form.accountEmail && !validateEmail(form.accountEmail)) ||
+      (field === 'salesEmail' && form.salesEmail && !validateEmail(form.salesEmail))
+    ) {
+      setMessage('Please enter a valid email address.');
+      setSaving(false);
+      return;
+    }
     try {
       const patch = field === 'productCategories'
         ? { productCategories: form.productCategories }
