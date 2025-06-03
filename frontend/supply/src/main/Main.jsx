@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import jwt_decode from "jwt-decode";
 import { NAV_PAGES } from './constants/navPages';
 import { CSV_FIELDS } from './constants/csvFields';
 import { csvExample } from './constants/csvExample';
@@ -58,6 +57,16 @@ import { handleFileChange } from './utils/handleFileChange';
 import { removeCatalogue } from './utils/removeCatalogue';
 import { revertCatalogue } from './utils/revertCatalogue';
 import { clearHistory } from './utils/clearHistory';
+
+function jwt_decode(token) {
+  if (!token) return {};
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return {};
+  }
+}
 
 function Catalogue({ token, setRows, rows }) {
   const [search, setSearch] = useState('');
