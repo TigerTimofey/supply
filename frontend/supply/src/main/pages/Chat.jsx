@@ -7,6 +7,9 @@ export default function ChatPage() {
   const [messages, setMessages] = useState({});
   const [input, setInput] = useState('');
   const [search, setSearch] = useState('');
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 700 : false
+  );
 
   // Fetch clients from backend
   useEffect(() => {
@@ -15,17 +18,23 @@ export default function ChatPage() {
       .then(data => setClients(Array.isArray(data) ? data : []));
   }, []);
 
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 700);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Filter and sort clients: PRO first, then by name, and search by name
   const filteredClients = clients
     .filter(client =>
       client.name.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
-      // PRO first
       if ((b.pro ? 1 : 0) - (a.pro ? 1 : 0) !== 0) {
         return (b.pro ? 1 : 0) - (a.pro ? 1 : 0);
       }
-      // Then by name
       return a.name.localeCompare(b.name);
     });
 
@@ -44,77 +53,97 @@ export default function ChatPage() {
 
   return (
     <div style={catalogueContainerStyle}>
-                  <input
+      <h2 style={{ color: '#213254', marginBottom: 18 }}>Chat</h2>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 0 : 24,
+          minHeight: 400
+        }}
+      >
+        {/* Client list */}
+        <div
+          style={{
+            minWidth: isMobile ? '100%' : 220,
+            borderRight: isMobile ? 'none' : '1px solid #e0e0e0',
+            borderBottom: isMobile ? '1px solid #e0e0e0' : 'none',
+            paddingRight: isMobile ? 0 : 8,
+            paddingBottom: isMobile ? 18 : 0,
+            maxHeight: isMobile ? 'unset' : 500,
+            overflowY: 'auto',
+            marginBottom: isMobile ? 18 : 0,
+            width: isMobile ? '100%' : undefined
+          }}
+        >
+          <input
             type="text"
             placeholder="Search client"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
 
-              marginBottom: 12,
+              marginBottom: 42,
               padding: '7px 10px',
               borderRadius: 6,
               border: '1px solid #ccc',
               fontSize: 15
             }}
           />
-      <h2 style={{ color: '#213254', marginBottom: 18 }}>Chat</h2>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: 24,
-        minHeight: 400
-      }}>
-        {/* Client list */}
-        <div style={{
-          minWidth: 220,
-          borderRight: '1px solid #e0e0e0',
-          paddingRight: 18,
-          maxHeight: 500,
-          overflowY: 'auto'
-        }}>
-
-          {filteredClients.map(client => (
-            <div
-              key={client._id}
-              style={{
-                padding: '10px 8px',
-                borderRadius: 8,
-                background: selectedClient && selectedClient._id === client._id ? '#e6fbe6' : 'transparent',
-                color: selectedClient && selectedClient._id === client._id ? '#1ca21c' : '#213254',
-                fontWeight: selectedClient && selectedClient._id === client._id ? 700 : 500,
-                cursor: 'pointer',
-                marginBottom: 4,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8
-              }}
-              onClick={() => setSelectedClient(client)}
-            >
-              {client.name}
-              {client.pro && (
-                <span style={{
-                  marginLeft: 6,
-                  background: '#e6fbe6',
-                  color: '#1ca21c',
-                  fontWeight: 700,
-                  fontSize: 12,
-                  borderRadius: 6,
-                  padding: '2px 8px'
-                }}>
-                  PRO
-                </span>
-              )}
-            </div>
-          ))}
+          <div style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'row' : 'column',
+            gap: isMobile ? 8 : 0,
+            overflowX: isMobile ? 'auto' : 'unset'
+          }}>
+            {filteredClients.map(client => (
+              <div
+                key={client._id}
+                style={{
+                  borderRadius: 8,
+                  background: selectedClient && selectedClient._id === client._id ? '#e6fbe6' : 'transparent',
+                  color: selectedClient && selectedClient._id === client._id ? '#1ca21c' : '#213254',
+                  fontWeight: selectedClient && selectedClient._id === client._id ? 700 : 500,
+                  cursor: 'pointer',
+                  marginBottom: isMobile ? 0 : 4,
+                  marginRight: isMobile ? 8 : 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minWidth: isMobile ? 120 : undefined,
+                  border: isMobile && selectedClient && selectedClient._id === client._id ? '1.5px solid #1ca21c' : 'none'
+                }}
+                onClick={() => setSelectedClient(client)}
+              >
+                {client.name}
+                {client.pro && (
+                  <span style={{
+                    marginLeft: 6,
+                    background: '#e6fbe6',
+                    color: '#1ca21c',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    borderRadius: 6,
+                    padding: '2px 8px'
+                  }}>
+                    PRO
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
         {/* Chat area */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 300
-        }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 300,
+            marginTop: isMobile ? 18 : 0,
+            width: isMobile ? '100%' : undefined
+          }}
+        >
           {selectedClient ? (
             <>
               <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: '#213254' }}>
@@ -140,7 +169,7 @@ export default function ChatPage() {
                 padding: 16,
                 marginBottom: 12,
                 minHeight: 200,
-                maxHeight: 320,
+                maxHeight: isMobile ? 260 : 320,
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
