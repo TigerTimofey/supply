@@ -1,4 +1,3 @@
-
 export const catalogueContainerStyle = {
   maxWidth: 1900,
   margin: '0 auto',
@@ -820,3 +819,143 @@ export const categoryBtnStyle = (selected) => ({
   fontSize: 15,
   transition: 'all 0.15s'
 });
+export const catalogueHistoryModalOverlayStyle = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'rgba(0,0,0,0.25)',
+  zIndex: 2000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+};
+
+export const catalogueHistoryModalStyle = {
+  background: '#fff',
+  borderRadius: 12,
+  padding: 32,
+  minWidth: 340,
+  maxWidth: 500,
+  boxShadow: '0 4px 32px rgba(0,0,0,0.15)',
+  position: 'relative'
+};
+
+export const catalogueHistoryCloseBtnStyle = {
+  position: 'absolute',
+  top: 16,
+  right: 16,
+  background: 'none',
+  border: 'none',
+  fontSize: 22,
+  color: '#213254',
+  cursor: 'pointer'
+};
+
+export const catalogueHistoryTitleStyle = {
+  marginTop: 0,
+  color: '#213254'
+};
+
+export const catalogueHistoryNoHistoryStyle = {
+  color: '#888'
+};
+
+export const catalogueHistoryListStyle = {
+  listStyle: 'none',
+  padding: 0,
+  margin: 0
+};
+
+export const catalogueHistoryListItemStyle = {
+  marginBottom: 18,
+  borderBottom: '1px solid #eee',
+  paddingBottom: 10,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between'
+};
+
+export const catalogueHistoryListItemActionStyle = {
+  // bold by default, but you can add more if needed
+};
+
+export const catalogueHistoryListItemDateStyle = {
+  color: '#888',
+  marginLeft: 8,
+  fontSize: 13
+};
+
+export const catalogueHistoryRevertBtnStyle = {
+  marginLeft: 10,
+  background: '#61dafb',
+  color: '#213254',
+  border: 'none',
+  borderRadius: 5,
+  padding: '2px 10px',
+  fontWeight: 700,
+  fontSize: 13,
+  cursor: 'pointer'
+};
+
+export const catalogueHistoryClearBtnStyle = {
+  marginTop: 8,
+  background: '#f0f4f8',
+  color: '#213254',
+  border: '1px solid #d1d5db',
+  borderRadius: 5,
+  padding: '4px 12px',
+  fontWeight: 500,
+  fontSize: 13,
+  cursor: 'pointer',
+  width: '100%',
+  marginBottom: 8,
+  transition: 'background 0.15s, color 0.15s, border 0.15s'
+};
+
+export const catalogueStatsContainerStyle = {
+  display: 'flex',
+  gap: 24,
+  marginBottom: 32,
+  flexWrap: 'wrap',
+  justifyContent: 'space-between'
+};
+
+export const catalogueStatsCardStyle = {
+  flex: '1 1 200px',
+  background: '#f7fafd',
+  borderRadius: 12,
+  padding: '24px 18px',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+  minWidth: 200,
+  textAlign: 'left'
+};
+
+export const catalogueStatsTitleStyle = {
+  fontWeight: 700,
+  fontSize: 18,
+  marginBottom: 8
+};
+
+export const catalogueStatsValueStyle = {
+  color: '#213254',
+  fontWeight: 700,
+  fontSize: 16
+};
+
+export const catalogueStatsHistoryLinkStyle = {
+  color: '#213254',
+  fontWeight: 700,
+  fontSize: 16,
+  marginBottom: 8,
+  cursor: 'pointer',
+  textDecoration: 'underline'
+};
+
+export const catalogueStatsNoHistoryStyle = {
+  color: '#213254',
+  fontWeight: 700,
+  fontSize: 16,
+  marginBottom: 8
+};
