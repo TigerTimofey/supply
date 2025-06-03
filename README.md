@@ -1,3 +1,5 @@
+[![Demo Video](https://img.shields.io/badge/Live%20Demo-Available-blue)](https://youtu.be/ktBYXccr_w0)
+
 # Supply Platform
 
 A full-stack web application for suppliers to manage their product catalogues, customers, and orders. The platform includes a React frontend and a Node.js/Express backend with MongoDB.
