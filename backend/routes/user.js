@@ -3,7 +3,7 @@ const router = express.Router();
 const userRepository = require('../repositories/UserRepository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // <-- Add this import
+const User = require('../models/User');
 
 // JWT authentication middleware
 function authenticateToken(req, res, next) {
@@ -21,7 +21,7 @@ function authenticateToken(req, res, next) {
 // Get all users
 router.get('/', async (req, res) => {
     try {
-        const users = await User.find(); // Use the imported User model
+        const users = await User.find(); 
         res.json(users);
     } catch (err) {
         res.status(400).json({ error: err.message });

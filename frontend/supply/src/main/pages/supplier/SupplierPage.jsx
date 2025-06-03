@@ -42,9 +42,7 @@ export default function SupplierPage() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.innerWidth < 700 : false
   );
-  const [showEmailTooltip, setShowEmailTooltip] = useState(false);
-  const [showAccountEmailTooltip, setShowAccountEmailTooltip] = useState(false);
-  const [showSalesEmailTooltip, setShowSalesEmailTooltip] = useState(false);
+
   const [emailError, setEmailError] = useState('');
   const [accountEmailError, setAccountEmailError] = useState('');
   const [salesEmailError, setSalesEmailError] = useState('');
@@ -191,25 +189,6 @@ export default function SupplierPage() {
     setSaving(false);
   };
 
-  const emailTooltip = (
-    <span style={{
-      position: 'absolute',
-      left: '100%',
-      top: 0,
-      marginLeft: 12,
-      background: '#fff',
-      color: '#213254',
-      border: '1px solid #61dafb',
-      borderRadius: 8,
-      padding: '8px 14px',
-      fontSize: 14,
-      boxShadow: '0 2px 12px rgba(33,50,84,0.10)',
-      zIndex: 10,
-      minWidth: 180
-    }}>
-      Please enter a valid email address (e.g. name@example.com)
-    </span>
-  );
 
   if (error) {
     return (
