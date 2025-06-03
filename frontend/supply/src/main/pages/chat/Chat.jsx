@@ -13,7 +13,7 @@ export default function ChatPage() {
 
   // Fetch clients from backend
   useEffect(() => {
-    fetch('http://localhost:8080/customers')
+    fetch('https://supply-navy.vercel.app/customers')
       .then(res => res.json())
       .then(data => setClients(Array.isArray(data) ? data : []));
   }, []);

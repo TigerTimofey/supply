@@ -85,7 +85,7 @@ export default function PaymentsPage() {
 
   // Fetch customers and orders from backend
   useEffect(() => {
-    fetch('http://localhost:8080/customers')
+    fetch('https://supply-navy.vercel.app/customers')
       .then(res => res.json())
       .then(data => setCustomers(Array.isArray(data) ? data : []));
   }, []);

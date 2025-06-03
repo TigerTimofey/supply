@@ -14,7 +14,7 @@ export default function Login({ onLogin, switchToRegister }) {
     e.preventDefault();
     setMessage('');
     try {
-      const res = await fetch('http://localhost:8080/auth/login', {
+      const res = await fetch('https://supply-navy.vercel.app/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -31,7 +31,7 @@ export default function Login({ onLogin, switchToRegister }) {
           if (payload.userId) {
             localStorage.setItem('userId', payload.userId);
             // Optionally, fetch user data and store in localStorage
-            fetch(`http://localhost:8080/users/${payload.userId}`)
+            fetch(`https://supply-navy.vercel.app/users/${payload.userId}`)
               .then(res => res.json())
               .then(user => {
                 localStorage.setItem('supplierName', user.supplierName || '');

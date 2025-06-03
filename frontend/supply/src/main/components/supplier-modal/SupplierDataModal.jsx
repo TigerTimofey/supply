@@ -39,7 +39,7 @@ export default function SupplierDataModal({ open, onClose, userId }) {
 
   useEffect(() => {
     if (open && userId) {
-      fetch(`http://localhost:8080/users/${userId}`)
+      fetch(`https://supply-navy.vercel.app/users/${userId}`)
         .then(res => res.json())
         .then(d => {
           setData(d);
@@ -94,7 +94,7 @@ export default function SupplierDataModal({ open, onClose, userId }) {
       const patch = field === 'productCategories'
         ? { productCategories: form.productCategories }
         : { [field]: form[field] };
-      const res = await fetch(`http://localhost:8080/users/${userId}`, {
+      const res = await fetch(`https://supply-navy.vercel.app/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

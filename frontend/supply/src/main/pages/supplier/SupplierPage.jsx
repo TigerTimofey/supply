@@ -78,7 +78,7 @@ export default function SupplierPage({ onNav }) {
       return;
     }
     setLoading(true);
-    fetch(`http://localhost:8080/users/${userId}`)
+    fetch(`https://supply-navy.vercel.app/users/${userId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch supplier data');
         return res.json();
@@ -103,7 +103,7 @@ export default function SupplierPage({ onNav }) {
 
   // Fetch customers and check for active status
   useEffect(() => {
-    fetch('http://localhost:8080/customers')
+    fetch('https://supply-navy.vercel.app/customers')
       .then(res => res.json())
       .then(data => {
         setCustomers(data);
@@ -175,7 +175,7 @@ export default function SupplierPage({ onNav }) {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8080/users/${userId}`, {
+      const res = await fetch(`https://supply-navy.vercel.app/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

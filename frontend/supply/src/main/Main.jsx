@@ -92,7 +92,7 @@ function Catalogue({ token, setRows, rows }) {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch(`http://localhost:8080/users/${userId}`)
+    fetch(`https://supply-navy.vercel.app/users/${userId}`)
       .then(res => res.json())
       .then(user => {
         if (user.catalogueCsv) {
@@ -121,7 +121,7 @@ function Catalogue({ token, setRows, rows }) {
   // Check if user has history
   useEffect(() => {
     if (!userId) return;
-    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+    fetch(`https://supply-navy.vercel.app/users/${userId}/catalogue/history`)
       .then(res => res.json())
       .then(data => setHasHistory(Array.isArray(data) && data.length > 0));
   }, [userId, fileName]);
@@ -129,7 +129,7 @@ function Catalogue({ token, setRows, rows }) {
   // Fetch history for stats card
   useEffect(() => {
     if (!userId) return;
-    fetch(`http://localhost:8080/users/${userId}/catalogue/history`)
+    fetch(`https://supply-navy.vercel.app/users/${userId}/catalogue/history`)
       .then(res => res.json())
       .then(data => setHistory(Array.isArray(data) ? data : []));
   }, [userId, fileName]);
@@ -385,7 +385,7 @@ export default function Main({ token, onLogout }) {
 
     // Only fetch supplierName if userIdDecoded is present
     if (userIdDecoded) {
-      fetch(`http://localhost:8080/users/${userIdDecoded}`)
+      fetch(`https://supply-navy.vercel.app/users/${userIdDecoded}`)
         .then(res => {
           if (!res.ok) return null;
           return res.json();

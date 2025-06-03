@@ -126,7 +126,7 @@ export default function InviteCustomersModal({ open, onClose, supplierId: propSu
         userId = JSON.parse(atob(token.split('.')[1])).userId;
       } catch {}
       if (userId) {
-        fetch(`http://localhost:8080/users/${userId}`)
+        fetch(`https://supply-navy.vercel.app/users/${userId}`)
           .then(res => res.json())
           .then(user => {
             setSupplierId(user._id || userId);
