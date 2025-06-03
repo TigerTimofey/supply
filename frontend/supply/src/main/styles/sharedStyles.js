@@ -1,4 +1,4 @@
-// Catalogue styles
+
 export const catalogueContainerStyle = {
   maxWidth: 1900,
   margin: '0 auto',
@@ -146,7 +146,6 @@ export const noDataTdStyle = {
   textAlign: 'center'
 };
 
-// SupplierDataModal styles
 export const inputStyle = {
   fontWeight: 500,
   border: '1.5px solid #61dafb',
@@ -286,7 +285,6 @@ export const mapContainerStyle = {
   marginTop: 18
 };
 
-// Main nav styles
 export const navStyle = {
   background: '#23272f',
   color: '#fff',
@@ -778,3 +776,47 @@ export const editBtnStyle = {
   textDecoration: 'underline',
   padding: 0
 };
+
+export const linkBtnStyle = {
+  marginTop: 16,
+  background: 'none',
+  border: 'none',
+  color: '#61dafb',
+  cursor: 'pointer',
+  fontSize: 15,
+  textDecoration: 'underline'
+};
+
+export const registerContainerStyle = {
+  background: 'rgba(247, 247, 247, 0.09)',
+  padding: 32,
+  borderRadius: 16,
+  boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+  minWidth: 320,
+  maxWidth: 400,
+  width: '100%',
+  marginLeft: 16,
+  marginRight: 16
+};
+
+export const categoryListStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+  gap: 8,
+  marginBottom: 8,
+  justifyContent: 'center'
+};
+
+export const categoryBtnStyle = (selected) => ({
+  padding: '8px 16px',
+  borderRadius: 20,
+  border: selected ? '2px solid #61dafb' : '1px solid #ccc',
+  background: selected ? '#61dafb' : '#fff',
+  color: selected ? '#213254' : '#222',
+  fontWeight: 600,
+  cursor: 'pointer',
+  outline: 'none',
+  fontSize: 15,
+  transition: 'all 0.15s'
+});

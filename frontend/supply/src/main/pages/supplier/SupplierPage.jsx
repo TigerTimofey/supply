@@ -329,7 +329,7 @@ export default function SupplierPage({ onNav }) {
               <span style={inputStyle}>{supplier.salesEmail || '-'}</span>
             )}
           </div>
-          <div style={rowStyle}>
+  <div style={{ ...rowStyle, position: 'relative', flexDirection: 'column', alignItems: 'flex-start' }}>
             <span style={labelStyle}>Origin:</span>
             {edit ? (
               <input

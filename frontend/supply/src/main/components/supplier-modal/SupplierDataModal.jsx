@@ -442,6 +442,7 @@ export default function SupplierDataModal({ open, onClose, userId }) {
                 <>
                   <div style={mobileLabelEditRow}>
                     <span style={labelStyle}>Origin:</span>
+                    
                     {editField !== 'origin' && (
                       <button
                         type="button"

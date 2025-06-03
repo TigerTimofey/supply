@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  inputStyle,
+  saveBtnStyle,
+  messageStyle,
+  buttonGroupStyle,
+  linkBtnStyle
+} from '../../main/styles/sharedStyles';
 
 export default function Login({ onLogin, switchToRegister }) {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -25,17 +32,14 @@ export default function Login({ onLogin, switchToRegister }) {
         onLogin && onLogin(data.token);
         localStorage.setItem('token', data.token);
 
-        // Fetch user data after login and store userId in localStorage
         try {
           const payload = JSON.parse(atob(data.token.split('.')[1]));
           if (payload.userId) {
             localStorage.setItem('userId', payload.userId);
-            // Optionally, fetch user data and store in localStorage
             fetch(`https://supply-sooty.vercel.app/users/${payload.userId}`)
               .then(res => res.json())
               .then(user => {
                 localStorage.setItem('supplierName', user.supplierName || '');
-                // You can store more user fields if needed
               });
           }
         } catch {}
@@ -74,12 +78,7 @@ export default function Login({ onLogin, switchToRegister }) {
           value={form.email}
           onChange={handleChange}
           required
-          style={{
-            padding: 12,
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            fontSize: 16
-          }}
+          style={inputStyle}
         />
         <input
           type="password"
@@ -88,45 +87,24 @@ export default function Login({ onLogin, switchToRegister }) {
           value={form.password}
           onChange={handleChange}
           required
-          style={{
-            padding: 12,
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            fontSize: 16
-          }}
+          style={inputStyle}
         />
-        <button
-          type="submit"
-          style={{
-            padding: 12,
-            borderRadius: 8,
-            border: 'none',
-            background: '#61dafb',
-            color: '#222',
-            fontWeight: 700,
-            fontSize: 16,
-            cursor: 'pointer',
-            marginTop: 8
-          }}
-        >
-          Login
-        </button>
+        <div style={{ ...buttonGroupStyle, justifyContent: 'center' }}>
+          <button
+            type="submit"
+            style={{ ...saveBtnStyle, flex: 1 }}
+          >
+            Login
+          </button>
+        </div>
       </form>
       <button
         onClick={switchToRegister}
-        style={{
-          marginTop: 16,
-          background: 'none',
-          border: 'none',
-          color: '#61dafb',
-          cursor: 'pointer',
-          fontSize: 15,
-          textDecoration: 'underline'
-        }}
+        style={linkBtnStyle}
       >
         Create an account
       </button>
-      {message && <div style={{ marginTop: 18, color: '#ffbaba', fontWeight: 500 }}>{message}</div>}
+      {message && <div style={messageStyle(false)}>{message}</div>}
     </div>
   );
 }

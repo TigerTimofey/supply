@@ -1,4 +1,15 @@
 import React, { useState } from 'react';
+import {
+  inputStyle,
+  buttonGroupStyle,
+  saveBtnStyle,
+  cancelBtnStyle,
+  messageStyle,
+  linkBtnStyle,
+  registerContainerStyle,
+  categoryListStyle,
+  categoryBtnStyle
+} from '../../main/styles/sharedStyles';
 
 const CATEGORY_OPTIONS = [
   'alcohol',
@@ -123,37 +134,8 @@ export default function Register({ switchToLogin }) {
     }
   };
 
-  const buttonStyle = {
-    padding: 12,
-    borderRadius: 8,
-    border: 'none',
-    background: '#61dafb',
-    color: '#222',
-    fontWeight: 700,
-    fontSize: 16,
-    cursor: 'pointer',
-    marginTop: 8,
-    flex: 1
-  };
-
-  const backButtonStyle = {
-    ...buttonStyle,
-    background: '#ccc',
-    color: '#222'
-  };
-
   return (
-    <div style={{
-      background: 'rgba(247, 247, 247, 0.09)',
-      padding: 32,
-      borderRadius: 16,
-      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
-      minWidth: 320,
-      maxWidth: 400,
-      width: '100%',
-      marginLeft: 16,
-      marginRight: 16
-    }}>
+    <div style={registerContainerStyle}>
       <h2 style={{ marginBottom: 24, fontWeight: 700, letterSpacing: 1 }}>Register</h2>
       <form
         onSubmit={step === 4 ? handleSubmit : handleNext}
@@ -168,12 +150,7 @@ export default function Register({ switchToLogin }) {
               value={form.email}
               onChange={handleChange}
               required
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
             <input
               type="password"
@@ -182,12 +159,7 @@ export default function Register({ switchToLogin }) {
               value={form.password}
               onChange={handleChange}
               required
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
           </>
         )}
@@ -200,12 +172,7 @@ export default function Register({ switchToLogin }) {
               value={form.supplierName}
               onChange={handleChange}
               required
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
             <input
               type="text"
@@ -214,43 +181,20 @@ export default function Register({ switchToLogin }) {
               value={form.origin}
               onChange={handleChange}
               required
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
           </>
         )}
         {step === 3 && (
           <>
-            <div style={{ marginBottom: 8, fontWeight: 700}}>Select Product Categories:</div>
-            <div style={{
-              display: 'flex',
-              alignItems: "center",
-              flexWrap: 'wrap',
-              gap: 8,
-              marginBottom: 8,
-              justifyContent: 'center' 
-            }}>
+            <div style={{ marginBottom: 8, fontWeight: 700 }}>Select Product Categories:</div>
+            <div style={categoryListStyle}>
               {CATEGORY_OPTIONS.map(cat => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => handleCategoryClick(cat)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: 20,
-                    border: form.productCategories.includes(cat) ? '2px solid #61dafb' : '1px solid #ccc',
-                    background: form.productCategories.includes(cat) ? '#61dafb' : '#fff',
-                    color: form.productCategories.includes(cat) ? '#213254' : '#222',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    outline: 'none',
-                    fontSize: 15,
-                    transition: 'all 0.15s'
-                  }}
+                  style={categoryBtnStyle(form.productCategories.includes(cat))}
                 >
                   {cat}
                 </button>
@@ -271,12 +215,7 @@ export default function Register({ switchToLogin }) {
               placeholder="Account Email"
               value={form.accountEmail}
               onChange={handleChange}
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
             <input
               type="email"
@@ -284,20 +223,21 @@ export default function Register({ switchToLogin }) {
               placeholder="Sales Email"
               value={form.salesEmail}
               onChange={handleChange}
-              style={{
-                padding: 12,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                fontSize: 16
-              }}
+              style={inputStyle}
             />
           </>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{
+          ...buttonGroupStyle,
+          justifyContent: step > 1 ? 'space-between' : 'center'
+        }}>
           {step > 1 && (
             <button
               onClick={handleBack}
-              style={backButtonStyle}
+              style={{
+                ...cancelBtnStyle,
+                flex: 1
+              }}
               type="button"
             >
               Back
@@ -306,7 +246,10 @@ export default function Register({ switchToLogin }) {
           {step < 4 && (
             <button
               type="submit"
-              style={buttonStyle}
+              style={{
+                ...saveBtnStyle,
+                flex: step > 1 ? 1 : 1
+              }}
               disabled={checking}
             >
               {checking && step === 1 ? 'Checking...' : 'Next'}
@@ -315,7 +258,10 @@ export default function Register({ switchToLogin }) {
           {step === 4 && (
             <button
               type="submit"
-              style={buttonStyle}
+              style={{
+                ...saveBtnStyle,
+                flex: 1
+              }}
             >
               Register
             </button>
@@ -324,27 +270,12 @@ export default function Register({ switchToLogin }) {
       </form>
       <button
         onClick={switchToLogin}
-        style={{
-          marginTop: 16,
-          background: 'none',
-          border: 'none',
-          color: '#61dafb',
-          cursor: 'pointer',
-          fontSize: 15,
-          textDecoration: 'underline'
-        }}
+        style={linkBtnStyle}
       >
         Back to login
       </button>
       {message && (
-        <div
-          style={{
-            marginTop: 18,
-            color: message === 'Registration successful! You can now log in.' ? '#4BB543' : '#ffbaba',
-            fontWeight: 500,
-            textAlign: 'center'
-          }}
-        >
+        <div style={messageStyle(message === 'Registration successful! You can now log in.')}>
           {message}
         </div>
       )}
