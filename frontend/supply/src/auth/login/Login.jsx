@@ -24,6 +24,22 @@ export default function Login({ onLogin, switchToRegister }) {
         setMessage('Login successful!');
         onLogin && onLogin(data.token);
         localStorage.setItem('token', data.token);
+
+        // Fetch user data after login and store userId in localStorage
+        try {
+          const payload = JSON.parse(atob(data.token.split('.')[1]));
+          if (payload.userId) {
+            localStorage.setItem('userId', payload.userId);
+            // Optionally, fetch user data and store in localStorage
+            fetch(`http://localhost:8080/users/${payload.userId}`)
+              .then(res => res.json())
+              .then(user => {
+                localStorage.setItem('supplierName', user.supplierName || '');
+                // You can store more user fields if needed
+              });
+          }
+        } catch {}
+
         navigate('/main');
       } else {
         if (data.error === 'Invalid credentials') {

@@ -11,6 +11,7 @@ import CustomersPage from './pages/customers/Customers';
 import PaymentsPage from './pages/paymants/Payments';
 import ChatPage from './pages/chat/Chat';
 import MarketingPage from './pages/marketing/Marketing';
+import SupplierPage from './pages/supplier/SupplierPage';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -360,6 +361,7 @@ export default function Main({ token, onLogout }) {
       optional_hide_from_market: ''
     }
   ]);
+  const [showSupplierPage, setShowSupplierPage] = useState(false);
   const dropdownRef = useRef();
   const burgerRef = useRef();
 
@@ -418,7 +420,7 @@ export default function Main({ token, onLogout }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           <span
             style={navBrandStyle}
-            onClick={() => setActivePage('catalogue')}
+            onClick={() => setShowSupplierPage(true)}
           >
             NOT A REKKI
           </span>
@@ -426,7 +428,10 @@ export default function Main({ token, onLogout }) {
             {NAV_PAGES.map(page => (
               <button
                 key={page.key}
-                onClick={() => setActivePage(page.key)}
+                onClick={() => {
+                  setActivePage(page.key);
+                  setShowSupplierPage(false);
+                }}
                 style={navBtnStyle(activePage === page.key)}
               >
                 {page.label}
@@ -525,7 +530,9 @@ export default function Main({ token, onLogout }) {
       </nav>
       <SupplierDataModal open={supplierModalOpen} onClose={() => setSupplierModalOpen(false)} userId={userId} />
       <div style={{ padding: 32 }}>
-        {activePage === 'catalogue' ? (
+        {showSupplierPage ? (
+          <SupplierPage />
+        ) : activePage === 'catalogue' ? (
           <Catalogue token={token} setRows={setRows} rows={rows} />
         ) : activePage === 'orders' ? (
           <Orders catalogueRows={rows} />
