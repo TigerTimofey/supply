@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle, searchInputStyle, dividerLineStyle } from '../styles/sharedStyles';
-import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
-import { STATEMENTS } from '../fake/ordersDb';
+import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle, searchInputStyle, dividerLineStyle } from '../../styles/sharedStyles';
+import { getOrdersFromCatalogueRows } from '../../fake/ordersDb';
+import { STATEMENTS } from '../../fake/ordersDb';
 
 
 

@@ -225,14 +225,14 @@ export default function Register({ switchToLogin }) {
         )}
         {step === 3 && (
           <>
-            <div style={{ marginBottom: 8, fontWeight: 700 /* bold */ }}>Select Product Categories:</div>
+            <div style={{ marginBottom: 8, fontWeight: 700}}>Select Product Categories:</div>
             <div style={{
               display: 'flex',
               alignItems: "center",
               flexWrap: 'wrap',
               gap: 8,
               marginBottom: 8,
-              justifyContent: 'center' // center the buttons
+              justifyContent: 'center' 
             }}>
               {CATEGORY_OPTIONS.map(cat => (
                 <button

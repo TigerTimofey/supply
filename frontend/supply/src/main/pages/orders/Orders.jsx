@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getOrdersFromCatalogueRows } from '../fake/ordersDb';
+import { getOrdersFromCatalogueRows } from '../../fake/ordersDb';
 import {
   catalogueContainerStyle,
   searchInputStyle,
@@ -10,8 +10,8 @@ import {
   modalStyle,
   closeBtnStyle,
   saveBtnStyle
-} from '../styles/sharedStyles';
-import InviteCustomersModal from '../components/InviteCustomersModal';
+} from '../../styles/sharedStyles';
+import InviteCustomersModal from '../../components/InviteCustomersModal';
 
 // Order Modal
 function OrderModal({ open, order, onClose }) {

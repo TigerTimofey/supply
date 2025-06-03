@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { catalogueContainerStyle, saveBtnStyle } from '../styles/sharedStyles';
+import { catalogueContainerStyle, saveBtnStyle } from '../../styles/sharedStyles';
 
 export default function ChatPage() {
   const [clients, setClients] = useState([]);
@@ -119,12 +119,14 @@ export default function ChatPage() {
                 {client.pro && (
                   <span style={{
                     marginLeft: 6,
-                    background: '#e6fbe6',
-                    color: '#1ca21c',
+                    background: '#61dafb',
+                    color: '#213254',
                     fontWeight: 700,
                     fontSize: 12,
                     borderRadius: 6,
-                    padding: '2px 8px'
+                    padding: '2px 10px',
+                    letterSpacing: 1,
+                    boxShadow: '0 1px 4px rgba(33,50,84,0.08)'
                   }}>
                     PRO
                   </span>

@@ -6,10 +6,11 @@ import { csvExample } from './constants/csvExample';
 import CatalogueStats from './components/catalogues-logic/CatalogueStats';
 import CatalogueHistoryModal from './components/catalogues-logic/CatalogueHistoryModal';
 import SupplierDataModal from './components/supplier-modal/SupplierDataModal';
-import Orders from './pages/Orders';
-import CustomersPage from './pages/Customers';
-import PaymentsPage from './pages/Payments';
-import ChatPage from './pages/Chat';
+import Orders from './pages/orders/Orders';
+import CustomersPage from './pages/customers/Customers';
+import PaymentsPage from './pages/paymants/Payments';
+import ChatPage from './pages/chat/Chat';
+import MarketingPage from './pages/marketing/Marketing';
 // Import shared styles
 import {
   catalogueContainerStyle,
@@ -534,6 +535,8 @@ export default function Main({ token, onLogout }) {
           <PaymentsPage />
         ) : activePage === 'chat' ? (
           <ChatPage />
+        ) : activePage === 'marketing' ? (
+          <MarketingPage />
         ) : activePage === 'supplier-data' ? (
           // No longer used as a page, keep fallback for safety
           <></>

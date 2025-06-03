@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import InviteCustomersModal from '../components/InviteCustomersModal';
-import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle } from '../styles/sharedStyles';
+import InviteCustomersModal from '../../components/InviteCustomersModal';
+import { catalogueContainerStyle, saveBtnStyle, thStyle, tdStyle } from '../../styles/sharedStyles';
 
 
 function CustomersTable({ customers, onArchive, onRestore, status }) {
