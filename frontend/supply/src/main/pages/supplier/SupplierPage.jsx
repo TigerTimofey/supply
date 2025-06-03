@@ -31,7 +31,7 @@ const REMINDER_CARDS = [
   }
 ];
 
-export default function SupplierPage() {
+export default function SupplierPage({ onNav }) {
   const [supplier, setSupplier] = useState(null);
   const [edit, setEdit] = useState(false);
   const [form, setForm] = useState({});
@@ -42,6 +42,8 @@ export default function SupplierPage() {
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.innerWidth < 700 : false
   );
+  const [customers, setCustomers] = useState([]);
+  const [customersActive, setCustomersActive] = useState(false);
 
   const [emailError, setEmailError] = useState('');
   const [accountEmailError, setAccountEmailError] = useState('');
@@ -97,6 +99,17 @@ export default function SupplierPage() {
         setError('Failed to fetch supplier data.');
         setLoading(false);
       });
+  }, []);
+
+  // Fetch customers and check for active status
+  useEffect(() => {
+    fetch('http://localhost:8080/customers')
+      .then(res => res.json())
+      .then(data => {
+        setCustomers(data);
+        setCustomersActive(data.some(c => c.status === 'active'));
+      })
+      .catch(() => setCustomersActive(false));
   }, []);
 
   const handleChange = e => {
@@ -226,7 +239,8 @@ export default function SupplierPage() {
     supplier.productCategories.length > 0
   );
   const isPricelistAdded = !!(supplier && supplier.catalogueCsv && supplier.catalogueCsv.length > 0);
-  const isCustomersAdded = !!(supplier && supplier.customers && supplier.customers.length > 0);
+  // Use customersActive instead of supplier.customers
+  const isCustomersAdded = customersActive;
 
   const reminderStatus = {
     profile: isProfileFilled,
@@ -244,7 +258,7 @@ export default function SupplierPage() {
         marginBottom: 24
       }}>
         <div style={{ flex: 2, minWidth: 0 }}>
-  <div style={{ ...rowStyle, position: 'relative', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ ...rowStyle, position: 'relative', flexDirection: 'column', alignItems: 'flex-start' }}>
             <span style={labelStyle}>Supplier Name:</span>
             {edit ? (
               <input
@@ -446,6 +460,15 @@ export default function SupplierPage() {
         }}>
           {REMINDER_CARDS.map((card, idx) => {
             const done = reminderStatus[card.key];
+            let navTarget = null;
+            let navLabel = null;
+            if (card.key === 'pricelist') {
+              navTarget = 'catalogue';
+              navLabel = 'Go to catalogue';
+            } else if (card.key === 'customers') {
+              navTarget = 'customers';
+              navLabel = 'Go to customers';
+            }
             return (
               <div
                 key={card.key}
@@ -469,6 +492,27 @@ export default function SupplierPage() {
                   <div style={{ color: '#213254', fontSize: 15 }}>
                     {card.description}
                   </div>
+                  {!done && navTarget && (
+                    <button
+                      style={{
+                        marginTop: 12,
+                        background: card.color,
+                        color: '#213254',
+                        fontWeight: 600,
+                        border: 'none',
+                        borderRadius: 8,
+                        padding: '10px 0',
+                        cursor: 'pointer',
+                        fontSize: 15,
+                        width: '100%'
+                      }}
+                      onClick={() => {
+                        if (onNav) onNav(navTarget);
+                      }}
+                    >
+                      {navLabel}
+                    </button>
+                  )}
                 </div>
                 <div style={{
                   minWidth: 54,
@@ -488,6 +532,7 @@ export default function SupplierPage() {
               </div>
             );
           })}
+  
         </div>
       </div>
       {/* Map stays in its place */}

@@ -370,7 +370,7 @@ export default function Main({ token, onLogout }) {
       optional_hide_from_market: ''
     }
   ]);
-  const [showSupplierPage, setShowSupplierPage] = useState(false);
+  const [showSupplierPage, setShowSupplierPage] = useState(true); // default to true
   const dropdownRef = useRef();
   const burgerRef = useRef();
 
@@ -418,6 +418,12 @@ export default function Main({ token, onLogout }) {
     localStorage.removeItem('token');
     if (onLogout) onLogout();
     window.location.href = '/';
+  };
+
+  // Handler for navigation from SupplierPage reminders
+  const handleSupplierNav = (target) => {
+    setShowSupplierPage(false);
+    setActivePage(target);
   };
 
   // Responsive: show burger menu on mobile
@@ -542,7 +548,7 @@ export default function Main({ token, onLogout }) {
       <SupplierDataModal open={supplierModalOpen} onClose={() => setSupplierModalOpen(false)} userId={userId} />
       <div style={{ padding: 32 }}>
         {showSupplierPage ? (
-          <SupplierPage />
+          <SupplierPage onNav={handleSupplierNav} />
         ) : activePage === 'catalogue' ? (
           <Catalogue token={token} setRows={setRows} rows={rows} />
         ) : activePage === 'orders' ? (
