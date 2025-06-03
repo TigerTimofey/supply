@@ -4,6 +4,19 @@ A full-stack web application for suppliers to manage their product catalogues, c
 
 ---
 
+## Videos
+
+### Screen:
+
+https://github.com/user-attachments/assets/9d916778-f4bb-421c-89cd-e206a4d0d3f1
+
+
+### Mobile:
+
+https://github.com/user-attachments/assets/c170a408-675a-4d8b-93e4-90441a998f53
+
+---
+
 ## Features
 
 - **Supplier Profile Management**: Edit and view supplier information, including emails, origin, and product categories.
@@ -39,7 +52,6 @@ A full-stack web application for suppliers to manage their product catalogues, c
    Create a `.env` file in the `backend` directory with the following content:
 
    ```
-   JWT_SECRET=your_jwt_secret_here
    MONGO_URI=your_mongodb_connection_string
    PORT=8080
    ```
