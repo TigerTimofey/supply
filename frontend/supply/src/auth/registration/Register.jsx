@@ -6,7 +6,7 @@ import {
   cancelBtnStyle,
   messageStyle,
   linkBtnStyle,
-  registerContainerStyle,
+  getRegisterContainerStyle,
   categoryListStyle,
   categoryBtnStyle
 } from '../../main/styles/sharedStyles';
@@ -37,6 +37,13 @@ export default function Register({ switchToLogin }) {
   const [step, setStep] = useState(1);
   const [message, setMessage] = useState('');
   const [checking, setChecking] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+
+  React.useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -135,7 +142,7 @@ export default function Register({ switchToLogin }) {
   };
 
   return (
-    <div style={registerContainerStyle}>
+    <div style={getRegisterContainerStyle(isMobile)}>
       <h2 style={{ marginBottom: 24, fontWeight: 700, letterSpacing: 1 }}>Register</h2>
       <form
         onSubmit={step === 4 ? handleSubmit : handleNext}

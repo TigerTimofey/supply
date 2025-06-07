@@ -6,7 +6,7 @@ import {
   messageStyle,
   buttonGroupStyle,
   linkBtnStyle,
-  registerContainerStyle,
+  getRegisterContainerStyle,
   loginTitleStyle,
   loginFormStyle
 } from '../../main/styles/sharedStyles';
@@ -15,6 +15,13 @@ export default function Login({ onLogin, switchToRegister }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+
+  React.useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -61,7 +68,7 @@ export default function Login({ onLogin, switchToRegister }) {
   };
 
   return (
-    <div style={registerContainerStyle}>
+    <div style={getRegisterContainerStyle(isMobile)}>
       <h2 style={loginTitleStyle}>Login</h2>
       <form onSubmit={handleSubmit} style={loginFormStyle}>
         <input

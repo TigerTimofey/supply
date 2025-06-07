@@ -786,17 +786,29 @@ export const linkBtnStyle = {
   textDecoration: 'underline'
 };
 
-export const registerContainerStyle = {
+export const registerContainerStyleMobile = {
   background: 'rgba(247, 247, 247, 0.09)',
   padding: 32,
   borderRadius: 16,
   boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
-  minWidth: 320,
+  minWidth: 290,
+  maxWidth: 300
+};
+
+export const registerContainerStyleDesktop = {
+  background: 'rgba(247, 247, 247, 0.09)',
+  padding: 32,
+  borderRadius: 16,
+  boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+  minWidth: 290,
   maxWidth: 400,
   width: '100%',
   marginLeft: 16,
   marginRight: 16
 };
+
+export const getRegisterContainerStyle = (isMobile) =>
+  isMobile ? registerContainerStyleMobile : registerContainerStyleDesktop;
 
 export const categoryListStyle = {
   display: 'flex',
@@ -804,7 +816,7 @@ export const categoryListStyle = {
   flexWrap: 'wrap',
   gap: 8,
   marginBottom: 8,
-  justifyContent: 'center'
+  justifyContent: 'center',
 };
 
 export const categoryBtnStyle = (selected) => ({
